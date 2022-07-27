@@ -1,9 +1,11 @@
 import socket
 from _thread import *  # Import everything from thread
-import sys
+import json
 
 server = "192.168.29.95"  # Local IP
 port = 5555
+
+playersPos = {}  # clientUID : position
 
 sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -17,27 +19,49 @@ sk.listen(2)  # Max 2 number of clients allowed
 print("Waiting For connection, Server Started ")
 
 
-def threaded_client(conn):
+def threaded_client(conn, uid):
+    # on first connect send the uid
+    response = {
+        "action": "uid",
+        "data": uid
+    }
+    print(f"New Player Connected, sending resp {json.dumps(response)}")
+    conn.sendall(json.dumps(response).encode())
     """
     Should be run at a bg thread. Keeps track of a client and handles receiving and sending data
     :param conn: The connection object obtained upon calling socket.accept(). It will hold all the connected clients
+    :param uid: The UID that was assigned by the server when accepting the connection
     """
-    conn.send(str.encode("Connected Successfully"))  # Send The client a message saying that connection was successful
-    reply = ""
+
+    """
+    When a player connects it has to next send it's data, the server will then store that player's data in a dictionary 
+    And then we will return the whole player list to the client that way the client can update the player count as well as their position
+    
+    Player will continuously keep on sending it's player data which in turn will keep the server sending it updated the dictionary where all the players are stored
+    """
+
     # Continuously Try to receive data. If no data received we assume that the client has disconnected. A better way would be to ping and see if we get back a response
     while True:
         try:
-            data = conn.recv(2048)
-            reply = data.decode("utf-8")  # Decode the Encoded data we receive
-            if data is None:
-                print("Disconnected")
-                break
-            else:
-                print(f"Received : {reply}")
-                print(f"Sending : {reply}")
-            conn.sendall(str.encode(reply))  # Encode our information and then send it back to all connected clients
-        except e:
-            print(f"Error at ThreadedClient Message {str(e)}")
+            # If we are receiving data from client
+            if conn.recv(2048) is not None:
+                receive = json.loads(conn.recv(2048).decode("utf-8"))
+                action = receive['action']
+
+                if action == 'get_uid':
+                    print(f"Initial Connection for UId {uid}")
+                    response = {
+                        "action": "uid",
+                        "data": uid
+                    }
+                    conn.sendall(json.dumps(response).encode())
+                if action == 'update_pos':
+                    x = receive['data']['x']
+                    y = receive['data']['y']
+                    print(f"updating pos for {uid} x {x} y {y}")
+
+        except Exception as e:
+            print(f"Something Went Wrong {e}")
             break
     print("Lost Connection")
     conn.close()
@@ -47,8 +71,9 @@ def threaded_client(conn):
 
 while True:
     # Continuously Look for Connection
-    conn, addr = sk.accept()
-    print(f"Connected to {addr}")
+    conn, addr = sk.accept()  # Combination of IP and Port is unique
+    uid = str(addr[0]) + str(addr[1])
+    print(f"Player Connected and was assigned UID : {uid}")
     # We start a new thread because without a thread the program is going to wait for "threaded_client" function to be done before proceeding
     # We are going to have multiple client join at once and for each client we are going to run the threaded_client function in a different thread to not block the main thread
-    start_new_thread(threaded_client, (conn,))
+    start_new_thread(threaded_client, (conn, uid))
