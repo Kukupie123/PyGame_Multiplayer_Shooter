@@ -1,5 +1,12 @@
 class WorldBase:
     def __init__(self, frameArray, pg, pgScreen, frameChangeSpeed):
+        """
+        BG of the game world
+        :param frameArray: An array of frames that the Image will loop over to animate
+        :param pg: PyGame Reference
+        :param pgScreen: PyGame Screen/Window Reference
+        :param frameChangeSpeed: The Speed at which the frames will change
+        """
         self.pg = pg  # PyGame Reference
         self.pgScreen = pgScreen  # PyGame Screen Reference
         self.frameChangeSpeed = frameChangeSpeed  # How many frames to wait for until we skip to the next frame

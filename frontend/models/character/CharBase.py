@@ -28,10 +28,19 @@ class CharacterBase:
         self.currentFrame = self.frame['idle']
 
     def draw(self):
-        self.gameScreen.blit(self.currentFrame, (self.posX, self.posY))
+        """
+        Draws the current image on the screen based on posX and posY value
+        """
+        print(f"Drawing Player at location : {self.posX} and {self.posY}")
+        self.gameScreen.blit(self.currentFrame, (self.posX, self.posY))  # Draw character at current position
 
     def move(self):
-        keys = self.pg.key.get_pressed()
+        """
+        Checks keys dictionary of PyGame and uses it to update posX and posY value of character.
+        Do NOT forget to call draw to draw the character with the updated location data
+        """
+        keys = self.pg.key.get_pressed()  # Key active dict
+
         if keys[self.pg.K_LEFT]:
             x = -1
         elif keys[self.pg.K_RIGHT]:
@@ -54,34 +63,24 @@ class CharacterBase:
         # No Left/Right Movement
         if x == 0:
             if y == 0:
-                pass
-                # print("Idle")
+                print("Idle")
             elif y < 0:
-                pass
-                # print("Up")
+                print("Up")
             elif y > 0:
-                pass
-                # print("Down")
+                print("Down")
         # Right Movement
         elif x > 0:
             if y == 0:
-                pass
-                # print("Right")
+                print("Right")
             elif y < 0:
-                pass
-                # print("Top Right")
+                print("Top Right")
             elif y > 0:
-                pass
-                # print("Bottom Right")
+                print("Bottom Right")
         # Left Movement
         elif x < 0:
             if y == 0:
-                pass
-                # print("Left")
+                print("Left")
             elif y < 0:
-                pass
-                # print("Top Left")
+                print("Top Left")
             elif y > 0:
-                pass
-                # print("Bottom Left")
-        self.gameScreen.blit(self.currentFrame, (self.posX, self.posY))  # Draw character at current position
+                print("Bottom Left")
