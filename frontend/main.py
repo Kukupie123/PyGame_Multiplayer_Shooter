@@ -1,6 +1,6 @@
 import pygame as pg
-from frontend.models.character.CharBase import CharacterBase
-from frontend.models.world.WorldBase import WorldBase
+from src.models.character.CharBase import CharacterBase
+from src.models.world.WorldBase import WorldBase
 
 # Initializing PyGame Core ----------------------------
 screenSize = (800, 600)  # Set width and height
