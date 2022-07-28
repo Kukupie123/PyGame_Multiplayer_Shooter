@@ -1,3 +1,4 @@
+import time
 import uuid
 import random
 from _thread import *
@@ -8,12 +9,6 @@ class EnemyHandler:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.spawnTimerThreshold = 1200
-        self.currentSpawnTimer = 0
-
-        self.moveTimerThreshold = 50
-        self.currentMoveTimer = 0
-
         self.spawnTimerActive = False
         self.moveTimerActive = False
         self.enemies = {}
@@ -71,14 +66,9 @@ class EnemyHandler:
         Enemies are removed from list when it goes out of bound or is killed by client
         """
         while True:
-            self.currentSpawnTimer += 1
-
-            if self.currentSpawnTimer >= self.spawnTimerThreshold:
-                # Time to spawn more enemies if its less than equal to 4
-                if len(self.enemies) < 10:
-                    self.__createEnemy()
-                else:
-                    self.currentSpawnTimer = 0
+            if len(self.enemies) < 10:
+                self.__createEnemy()
+            time.sleep(15)
 
     def startMoveTimer(self):
         """
@@ -86,12 +76,8 @@ class EnemyHandler:
         """
         print("Move timer ACTIVE\n")
         while True:
-
-            self.currentMoveTimer += 1
-
-            if self.currentMoveTimer >= self.moveTimerThreshold:
-                self.__moveEnemies()
-                self.currentMoveTimer = 0
+            time.sleep(0.5)
+            self.__moveEnemies()
 
     def removeEnemy(self, UID):
         """
