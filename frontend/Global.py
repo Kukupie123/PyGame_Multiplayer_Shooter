@@ -2,6 +2,7 @@ import pygame as pg
 
 from frontend.models.characters.CharBase import CharacterBase
 from frontend.models.worlds.WldBase import WorldBase
+from _thread import *
 
 screenSize = (800, 600)  # Set width and height
 pg.init()  # initialize pygame
@@ -53,8 +54,7 @@ def draws():
 
 def perFrameTask():
     player.move()  # Listen to player input and allows the player to move
-    serverHandler.sendPlayerPos2Server(player.posX, player.posY)  # Sends the XY coordinate of the player to server
-    serverHandler.requestEnemiesData()  # Request Enemy Data from the server
+    serverHandler.sendEssentialData((player.posX, player.posY))
     draws()  # Draws
 
 

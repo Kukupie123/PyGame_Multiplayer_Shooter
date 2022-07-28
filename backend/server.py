@@ -30,6 +30,62 @@ logger.warning("Waiting For connection, Server Started ")
 dataSize = 5
 
 
+def threaded_clientV2(conn, uid):
+    global playersPos
+    # On first connect send the UID to the client so that they know their UID
+    resp = [
+        {
+            "action": "uid",
+            "data": uid
+        }
+    ]
+
+    conn.sendall(json.dumps(resp).encode())
+    logging.warning(f"{uid} connected")
+
+    while True:
+        try:
+            if conn.recv(2048*dataSize) is not None:
+                response = []
+                reqs = json.loads(conn.recv(2048 * dataSize).decode("utf-8"))  # Array of action and data dictionary
+
+                # For each action we want to create a response action dictionary and at the end of iteration send it
+                for req in reqs:
+                    action = req['action']
+
+                    # If client wants their UID
+                    if action == 'get_uid':
+                        resp = {
+                            "action": "uid",
+                            "data": uid
+                        }
+                        response.append(resp)
+
+                    # If client wants to update it's position
+                    if action == 'update_pos':
+                        x = req['data']['x']
+                        y = req['data']['y']
+                        playersPos[uid] = (x, y)
+                        resp = {"action": "pos_data", "data": playersPos}
+                        response.append(resp)
+
+                    # If client wants to get enemy data
+                    if action == 'get_enemy_data':
+                        dat = enemyHandler.getEnemies()  # Get the enemies data and send it to client
+                        resp = {
+                            "action": "enemy_data", "data": dat
+                        }
+                        response.append(resp)
+
+                # Once iteration over we are going to send the response array of action&Data as string
+                conn.sendall(json.dumps(response).encode())
+        except:
+            break
+    print("Lost Connection")
+    playersPos.pop(uid)
+    conn.close()
+
+
 def threaded_client(conn, uid):
     global playersPos
     # on first connect send the uid
@@ -92,8 +148,6 @@ def threaded_client(conn, uid):
     playersPos.pop(uid)
     conn.close()
 
-    pass
-
 
 while True:
     # Continuously Look for Connection
@@ -101,4 +155,4 @@ while True:
     uid = str(addr[0]) + str(addr[1])
     # We start a new thread because without a thread the program is going to wait for "threaded_client" function to be done before proceeding
     # We are going to have multiple client join at once and for each client we are going to run the threaded_client function in a different thread to not block the main thread
-    start_new_thread(threaded_client, (conn, uid))
+    start_new_thread(threaded_clientV2, (conn, uid))

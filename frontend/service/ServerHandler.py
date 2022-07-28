@@ -26,12 +26,12 @@ class ServerHandler:
         try:
             self.client.connect(self.addr)  # try to connect
             # Continuously Listen for server's response
-            self.processResponse(self.client.recv(2048).decode())
             start_new_thread(self.multi_listen, ())
         except Exception as e:
             print(f"Exception when trying to connect to server in clientNetwork.connect {e}")
 
     def processResponse(self, decodedResp):
+        print(f"Processing : {decodedResp}")
         try:
             """
             Listens to the server and when ever we get a response we try to parse it
@@ -39,7 +39,7 @@ class ServerHandler:
             """
             if decodedResp is not None:
 
-                respParsed = json.loads(decodedResp)  # Parse the Raw response to dict
+                respParsed = decodedResp  # Parse the Raw response to dict
                 log.info(f"Server sent response : {respParsed}")
                 if respParsed['action'] == 'uid':  # Update the Client UID
                     self.guestService.UID = respParsed['data']
@@ -60,34 +60,21 @@ class ServerHandler:
         """
         while True:
             try:
-                msgRaw = self.client.recv(2048 * dataSize).decode()
-                print(msgRaw)
-                self.processResponse(msgRaw)
+                msgRaw = self.client.recv(2048 * dataSize).decode()  # Return an array of action&Data Dict
+                response = json.loads(msgRaw)  # list of action&Data Dictionary
+                print(f"Server Sent US : {response}")
+                for resp in response:  # Iterate and process each action
+                    self.processResponse(resp)
             except Exception:
                 pass
 
-    def sendPlayerPos2Server(self, x, y):
-        """
-        Call After updating player position, this will also receive the server's response and call processResponse Function appropriately
-        """
+    def sendEssentialData(self, playerXYTuple):
         try:
-            req = {
-                "action": "update_pos",
-                "data": {"x": x, "y": y}
-            }
-            reqStr = json.dumps(req).encode()
-            self.client.send(reqStr)
-        except socket.error as e:
-            print(f"Exception at send at ClientNetwork.sendPos : {e}")
-
-    def requestEnemiesData(self):
-        """
-        Request the enemies data from the server
-        """
-        try:
-            req = {"action": "get_enemy_data"}
-            reqStr = json.dumps(req).encode()
-            self.client.send(reqStr)
-            pass
+            playerPOS = {"action": "update_pos", "data": {"x": playerXYTuple[0], "y": playerXYTuple[1]}}
+            reqEnemyData = {"action": "get_enemy_data"}
+            reqs = [playerPOS, reqEnemyData]
+            reqStr = json.dumps(reqs)
+            print(f"Sending to server : {reqStr}")
+            self.client.send(reqStr.encode())
         except Exception as e:
-            print(f"Exception at ServerHandler.requestEnemiesData : {e}")
+            print(f"Exception at sendEssentialData : {e}")
