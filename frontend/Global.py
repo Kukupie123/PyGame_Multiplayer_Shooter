@@ -1,6 +1,7 @@
 import pygame as pg
 
 from frontend.models.characters.CharBase import CharacterBase
+from frontend.models.characters.Enemy import Enemy
 from frontend.models.worlds.WldBase import WorldBase
 
 screenSize = (800, 600)  # Set width and height
@@ -42,9 +43,24 @@ player = CharacterBase(
     },
     speed=1, window=win, piegae=pg)
 
+testEnemy = Enemy(
+    enemyFrameArray=[
+        pg.image.load("./assets/enemy/crab0.png"),
+        pg.image.load("./assets/enemy/crab1.png"),
+        pg.image.load("./assets/enemy/crab2.png"),
+        pg.image.load("./assets/enemy/crab3.png"),
+    ],
+    speed=1,
+    piegae=pg,
+    window=win,
+    animationSpeed=15,
+    spawnPoint=1
+)
+
 
 def draws():
     world.drawWorld()
+    testEnemy.draw()
     player.draw()
     guestService.drawGuests()
     pg.display.update()

@@ -9,20 +9,22 @@ class CharacterBase:
         """
 
         # Image dictionary setup with the necessary image
-        self.frame = {
-            "idle": frameDict['idle'],
-            "top": frameDict['top'],
-            "down": frameDict['down'],
-            "left": frameDict['left'],
-            "right": frameDict['right']
-        }
+        if frameDict is not None:
+            self.frame = {
+                "idle": frameDict['idle'],
+                "top": frameDict['top'],
+                "down": frameDict['down'],
+                "left": frameDict['left'],
+                "right": frameDict['right']
+            }
         self.pg = piegae
         self.window = window
         # Setup Additional Data
         self.speed = speed  # Speed of player
         self.posX = (self.window.get_size()[0]) / 2
         self.posY = (self.window.get_size()[1]) / 2
-        self.currentFrame = self.frame['idle']
+        if frameDict is not None:
+            self.currentFrame = self.frame['idle']
 
     def draw(self):
         """
