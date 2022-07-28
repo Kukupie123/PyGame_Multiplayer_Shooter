@@ -16,7 +16,6 @@ class EnemyHandler:
 
     def __clamp(self, minAllowed, maxAllowed, value):
         if value < minAllowed or value > maxAllowed:
-            print("Claming")
             minDif = abs(value - minAllowed)
             maxDif = abs(value - maxAllowed)
             if minDif > maxDif:
@@ -55,11 +54,13 @@ class EnemyHandler:
                     if newY == 0 or newY == self.height - 50:
                         self.enemies.pop(k)
                         return
+                    self.enemies[k] = {
+                        'x': newX,
+                        'y': newY,
+                        'move': v['move']
+                    }
 
-                        # For left right movement
-                else:
-                    print("asdasd asd as da da")
-                    print(f"Enemy at {move}")
+                if move == 'RIGHT' or move == 'LEFT':
                     if random.randint(-50, 50) % 2 == 0:
                         if random.randint(-50, 50) % 2 == 0:
                             addY = speed
