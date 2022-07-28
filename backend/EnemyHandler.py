@@ -4,58 +4,131 @@ import random
 from _thread import *
 
 
-# noinspection PyMethodMayBeStatic
+# noinspection PyMethodMayBeStatic,DuplicatedCode
 class EnemyHandler:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.width = x
+        self.height = y
         self.spawnTimerActive = False
         self.moveTimerActive = False
         self.enemies = {}
         self.enemyType = ['crab', 'octopus']
 
+    def __clamp(self, minAllowed, maxAllowed, value):
+        if value < minAllowed or value > maxAllowed:
+            print("Claming")
+            minDif = abs(value - minAllowed)
+            maxDif = abs(value - maxAllowed)
+            if minDif > maxDif:
+                return maxAllowed
+                # Closer to max
+            else:
+                return minAllowed
+        return value
+
     def __moveEnemies(self):
-        for k, v in self.enemies.items():
+        try:
+            speed = 1
+            for k, v in self.enemies.items():
+                addX = 0
+                addY = 0
+                move = v['move']
+
+                # For Up Down
+                if move == 'DOWN' or 'UP':
+                    # X first
+                    if random.randint(-50, 50) % 2 == 0:
+                        if random.randint(-50, 50) % 2 == 0:
+                            addX = speed
+                        else:
+                            addX = speed * -1
+                    newX = v['x'] + addX
+
+                    # Clamp newX if needed
+                    newX = self.__clamp(minAllowed=0, maxAllowed=self.width - 50, value=newX)
+
+                    # Y now
+                    addY = speed if move == 'DOWN' else (speed * -1)
+                    newY = v['y'] + addY
+                    # Delete if we hit boundary
+                    newY = self.__clamp(minAllowed=0, maxAllowed=self.height - 50, value=newY)
+                    if newY == 0 or newY == self.height - 50:
+                        self.enemies.pop(k)
+                        return
+
+                        # For left right movement
+                else:
+                    print("asdasd asd as da da")
+                    print(f"Enemy at {move}")
+                    if random.randint(-50, 50) % 2 == 0:
+                        if random.randint(-50, 50) % 2 == 0:
+                            addY = speed
+                        else:
+                            addY = speed * -1
+
+                    newY = v['y'] + addY
+                    # Clamp newY if needed
+                    newY = self.__clamp(minAllowed=0, maxAllowed=self.height - 50, value=newY)
+
+                    # X now
+                    addX = speed if move == 'RIGHT' else speed * -1
+                    newX = addX + v['x']
+                    # If we hit boundary delete
+                    newX = self.__clamp(minAllowed=0, maxAllowed=self.width - 50, value=newX)
+                    if newX == 0 or newX == self.width - 50:
+                        self.enemies.pop(k)
+                        return
+                self.enemies[k] = {
+                    'x': newX,
+                    'y': newY,
+                    'move': v['move']
+                }
+        except:
             pass
 
     def __createEnemy(self):
-        EnemySpawnData = [
-            {
-                # Enemy will spawn on random X and Top Y and will move down gradually
-                "move": 'DOWN',
-                'x': random.randint(0, self.x - 50),
-                'y': 0
-            },
-            {
-                # Enemy will spawn on random X and Bottom Y and will move up gradually
-                "move": 'UP',
-                'x': random.randint(0, self.x - 50),
-                'y': self.y - 50
-            },
-            {
-                # Enemy will spawn on random Y and Left X and will move Right gradually
-                "move": 'RIGHT',
-                'x': 0,
-                'y': random.randint(0, self.y - 50)
-            },
-            {
-                # Enemy will spawn on random Y and Right X and will move Left gradually
-                "move": 'LEFT',
-                'x': self.x - 50,
-                'y': random.randint(0, self.y - 50)
+        try:
+            EnemySpawnData = [
+                {
+                    # Enemy will spawn on random X and Top Y and will move down gradually
+                    'x': random.randint(0, self.width - 50),
+                    'y': 0,
+                    'move': 'DOWN'
+                },
+                {
+                    # Enemy will spawn on random X and Bottom Y and will move up gradually
+                    'x': random.randint(0, self.width - 50),
+                    'y': self.height - 50,
+                    'move': 'UP'
+
+                },
+                {
+                    # Enemy will spawn on random Y and Left X and will move Right gradually
+                    'x': 0,
+                    'y': random.randint(0, self.height - 50),
+                    'move': 'RIGHT'
+                },
+                {
+                    # Enemy will spawn on random Y and Right X and will move Left gradually
+                    'x': self.width - 50,
+                    'y': random.randint(0, self.height - 50),
+                    'move': 'LEFT'
+                }
+            ]
+            randEnemyData = random.choice(EnemySpawnData)
+            uid = str(uuid.uuid4())  # UID for the enemy
+            # This will look like
+            # {654 : {x:34, y : 0, move : LEFT, type : crab}}
+            self.enemies[uid] = {
+                'x': randEnemyData['x'],
+                'y': randEnemyData['y'],
+                'type': random.choice(self.enemyType),
+                'move': randEnemyData['move']
             }
-        ]
-        randEnemyData = random.choice(EnemySpawnData)
-        uid = str(uuid.uuid4())  # UID for the enemy
-        # This will look like
-        # {654 : {x:34, y : 0, move : LEFT, type : crab}}
-        self.enemies[uid] = {
-            'x': randEnemyData['x'],
-            'y': randEnemyData['y'],
-            'move': randEnemyData['move'],
-            'type': random.choice(self.enemyType)
-        }
-        print(f"Created Enemy at position {self.enemies[uid]['x']} {self.enemies[uid]['y']}")
+            print(
+                f"Created Enemy at position {self.enemies[uid]['x']} {self.enemies[uid]['y']} move : {self.enemies[uid]['move']}")
+        except:
+            pass
 
     def startSpawnTimer(self):
         print("Spawn TIMER ACTIVE\n")
@@ -76,7 +149,7 @@ class EnemyHandler:
         """
         print("Move timer ACTIVE\n")
         while True:
-            time.sleep(0.5)
+            time.sleep(0.01)
             self.__moveEnemies()
 
     def removeEnemy(self, UID):
@@ -97,6 +170,6 @@ class EnemyHandler:
             start_new_thread(self.startSpawnTimer, ())
         if not self.moveTimerActive:
             self.moveTimerActive = True
-            # start_new_thread(self.startMoveTimer, ())
+            start_new_thread(self.startMoveTimer, ())
 
         return self.enemies

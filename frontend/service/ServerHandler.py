@@ -26,13 +26,12 @@ class ServerHandler:
         try:
             self.client.connect(self.addr)  # try to connect
             # Continuously Listen for server's response
-            self.client.recv(2048*dataSize).decode()
+            self.client.recv(2048 * dataSize).decode()
             start_new_thread(self.multi_listen, ())
         except Exception as e:
             print(f"Exception when trying to connect to server in clientNetwork.connect {e}")
 
     def processResponse(self, decodedResp):
-        print(f"Processing : {decodedResp}")
         try:
             """
             Listens to the server and when ever we get a response we try to parse it
@@ -63,7 +62,6 @@ class ServerHandler:
             try:
                 msgRaw = self.client.recv(2048 * dataSize).decode()  # Return an array of action&Data Dict
                 response = json.loads(msgRaw)  # list of action&Data Dictionary
-                print(f"Server Sent US : {response}")
                 for resp in response:  # Iterate and process each action
                     self.processResponse(resp)
             except Exception:
@@ -71,11 +69,11 @@ class ServerHandler:
 
     def sendEssentialData(self, playerXYTuple):
         try:
+            print(f"{playerXYTuple[0]} {playerXYTuple[1]}")
             playerPOS = {"action": "update_pos", "data": {"x": playerXYTuple[0], "y": playerXYTuple[1]}}
             reqEnemyData = {"action": "get_enemy_data"}
             reqs = [playerPOS, reqEnemyData]
             reqStr = json.dumps(reqs)
-            print(f"Sending to server : {reqStr}")
             self.client.send(reqStr.encode())
         except Exception as e:
             print(f"Exception at sendEssentialData : {e}")

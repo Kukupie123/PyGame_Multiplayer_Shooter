@@ -26,6 +26,18 @@ class CharacterBase:
         if frameDict is not None:
             self.currentFrame = self.frame['idle']
 
+    def __clamp(self, minAllowed, maxAllowed, value):
+        if value < minAllowed or value > maxAllowed:
+            print("Claming")
+            minDif = abs(value - minAllowed)
+            maxDif = abs(value - maxAllowed)
+            if minDif > maxDif:
+                return maxAllowed
+                # Closer to max
+            else:
+                return minAllowed
+        return value
+
     def draw(self):
         """
         Draws the current image on the screen based on posX and posY value
@@ -65,6 +77,9 @@ class CharacterBase:
         # Add the XY Values
         self.posX += x * self.speed
         self.posY += y * self.speed
+
+        self.posY = self.__clamp(minAllowed=0, maxAllowed=self.window.get_size()[1] - 50, value=self.posY)
+        self.posX = self.__clamp(minAllowed=0, maxAllowed=self.window.get_size()[0] - 50, value=self.posX)
 
         # Update the Frame based on XY values
 

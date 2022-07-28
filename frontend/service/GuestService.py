@@ -48,22 +48,24 @@ class GuestService:
         return testEnemy
 
     def drawEnemies(self):
-        for k, v in self.enemy_data.items():
-            if k not in self.enemies:  # If enemy we iterated over is not in the enemies list
-                print(f"Adding {k} to enemy list with data {v['y']}")
-                self.enemies[k] = self.__createEnemy()
+        try:
+            for k, v in self.enemy_data.items():
+                if k not in self.enemies:  # If enemy we iterated over is not in the enemies list
+                    self.enemies[k] = self.__createEnemy()
 
-            # Update the position of the enemies
-            self.enemies[k].updatePos(v['x'], v['y'])
+                # Update the position of the enemies
+                self.enemies[k].updatePos(v['x'], v['y'])
 
-        # Remove Duplicates
-        for k in self.enemies:
-            if k not in self.enemy_data:
-                self.enemies.pop(k)
+            # Remove Duplicates
+            for k in self.enemies:
+                if k not in self.enemy_data:
+                    self.enemies.pop(k)
 
-        # Finally we draw
-        for k in self.enemies:
-            self.enemies[k].draw()
+            # Finally we draw
+            for k in self.enemies:
+                self.enemies[k].draw()
+        except:
+            pass
 
     def drawOtherPlayers(self):
         for k, v in self.pos_dic.items():
