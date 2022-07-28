@@ -22,6 +22,7 @@ logger.warning("Waiting For connection, Server Started ")
 
 
 def threaded_client(conn, uid):
+    global playersPos
     # on first connect send the uid
     response = {
         "action": "uid",
@@ -45,11 +46,12 @@ def threaded_client(conn, uid):
     # Continuously Try to receive data. If no data received we assume that the client has disconnected. A better way would be to ping and see if we get back a response
     while True:
         try:
+            logger.warning(playersPos)
             # If we are receiving data from client
             if conn.recv(2048) is not None:
                 receive = json.loads(conn.recv(2048).decode("utf-8"))
                 action = receive['action']
-                logger.warning(f"Client {uid} requested action : {action}")
+                logger.info(f"Client {uid} requested action : {action}")
                 if action == 'get_uid':
                     print(f"Initial Connection for UId {uid}")
                     response = {
@@ -62,14 +64,18 @@ def threaded_client(conn, uid):
                     x = receive['data']['x']
                     y = receive['data']['y']
                     playersPos[uid] = (x, y)
+
+                    response = {"action": "pos_data", "data": playersPos}
                     # Send the client all the position data of other players in the server
-                    conn.sendall(json.dumps(playersPos).encode())
-                    logger.warning(f"updating pos for {uid} x {x} y {y} and sending back player pos dict {playersPos}")
+
+                    conn.sendall(json.dumps(response).encode())
+                    logger.info(f"updating pos for {uid} x {x} y {y} and sending back player pos dict {playersPos}")
 
         except Exception as e:
             print(f"Something Went Wrong {e}")
             break
     print("Lost Connection")
+    playersPos.pop(uid)
     conn.close()
 
     pass

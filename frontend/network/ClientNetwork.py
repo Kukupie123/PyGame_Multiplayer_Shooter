@@ -1,28 +1,31 @@
-import socket
 import json
 import logging
+import socket
+from _thread import *
 
 log = logging.getLogger("Client Network")
 
 
+# noinspection PyMethodMayBeStatic
 class ClientNetwork:
-    def __init__(self):
+    def __init__(self, gms):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "192.168.29.95"
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.uid = ""
-        self.connect()  # Once we successfully connect we are going to get back an ID and it will be set as UID
+        self.gms = gms
+        self.connect()  # Once we successfully connect we are going to continuously listen.
 
     def connect(self):
         """
         Connect, to the Server.
         Call onDataReceived after connecting to listen to further responds
-        :return:
         """
         try:
             self.client.connect(self.addr)  # try to connect
+            # Continuously Listen for server's response
             self.processResponse(self.client.recv(2048).decode())
+            start_new_thread(self.multi_listen, ())
         except Exception as e:
             print(f"Exception when trying to connect to server in clientNetwork.connect {e}")
 
@@ -34,12 +37,24 @@ class ClientNetwork:
         if decodedResp is not None:
 
             respParsed = json.loads(decodedResp)  # Parse the Raw response to dict
-            log.warning(f"Server sent response : {respParsed}")
-            if respParsed['action'] == 'uid':
-                self.uid = respParsed['data']
-                log.warning(f"UID Set to {self.uid}")
-            elif respParsed['action'] == 'pos_data':
+            log.info(f"Server sent response : {respParsed}")
+            if respParsed['action'] == 'uid':  # Update the Client UID
+                self.gms.UID = respParsed['data']
+
+            elif respParsed['action'] == 'pos_data':  # Position Data received
+                self.gms.updatePlayerPOSSERVER(respParsed['data'])  # Update All players position
+
+    def multi_listen(self):
+        """
+        RUN in MultiThread mode. This is a loop that will make the client keep on listening to the server and will freeze the program if not made to run in a multithreading environment
+        """
+        while True:
+            try:
+                msgRaw = self.client.recv(2048).decode()
+                self.processResponse(msgRaw)
+            except Exception:
                 pass
+                # print(f"Exception at listen {e}")
 
     def sendPosToServer(self, x, y):
         """

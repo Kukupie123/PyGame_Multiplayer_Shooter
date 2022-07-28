@@ -1,15 +1,11 @@
-import pygame as pg
 from frontend.models.character.CharBase import CharacterBase
 from frontend.models.world.WorldBase import WorldBase
-from frontend.network.ClientNetwork import ClientNetwork
+from PG import pg
 
-# Initializing PyGame Core ----------------------------
-screenSize = (800, 600)  # Set width and height
-pg.init()  # initialize pygame
-screen = pg.display.set_mode(screenSize)  # Setup Screen
-icon = pg.image.load("./assets/aquaman1-1.png.png")  # Load Icon
-pg.display.set_icon(icon)
 # Draw the World
+from frontend.network.ClientNetwork import ClientNetwork
+from frontend.service.GameModService import GMService
+
 world = WorldBase(frameArray=[
     pg.image.load("./assets/World/1/1_(1).png"),
     pg.image.load("./assets/World/1/1_(2).png"),
@@ -18,7 +14,7 @@ world = WorldBase(frameArray=[
     pg.image.load("./assets/World/1/1_(5).png"),
     pg.image.load("./assets/World/1/1_(6).png"),
     pg.image.load("./assets/World/1/1_(7).png")
-], frameChangeSpeed=30, pgScreen=screen, pg=pg)
+], frameChangeSpeed=30)
 
 # Spawning The MAIN PLAYER --------------------------------
 idle = pg.image.load("./assets/aquaman1-1.png.png")  # Initialize the frames for the player
@@ -31,20 +27,41 @@ mainPlayer = CharacterBase(
         'left': idle,
         'right': idle
     },
-    speed=1, pg=pg, pgScreen=screen, spawnPoint=None)
+    speed=1)
+
+# Creating GameModeService and ClientNetwork
+
+gms = GMService()
+cn = ClientNetwork(gms)  # Will connect and start listening, this will then start using GMS to update client as needed
 
 
 # FUNCTIONS --------------------------
 
 def redraw():
-    world.drawWorld()
-    mainPlayer.draw()
-    pg.display.update()
+    world.drawWorld()  # Draw the BG
+    mainPlayer.draw()  # Draw the main player
+
+    for k, v in gms.pos_dic.items():
+        # Spawning The Client PLAYER --------------------------------
+        idle = pg.image.load("./assets/aquaman1-1.png.png")  # Initialize the frames for the player
+        # Creating the player Object
+        tp = CharacterBase(
+            frameDict={
+                "idle": idle,
+                'top': idle,
+                'down': idle,
+                'left': idle,
+                'right': idle
+            },
+            speed=1)
+        tp.updatePos(v[0], v[1])
+        tp.draw()
+
+    pg.display.update()  # Update the UI
 
 
 # Game Loop Logic
 def startGame():
-    n = ClientNetwork()  # Connects to the server
     running = True
     # Game Loop
     while running:
@@ -53,7 +70,7 @@ def startGame():
             if e.type == pg.QUIT:
                 running = False
         mainPlayer.move()
-        n.sendPosToServer(mainPlayer.posX, mainPlayer.posY)
+        cn.sendPosToServer(mainPlayer.posX, mainPlayer.posY)
         redraw()
 
 

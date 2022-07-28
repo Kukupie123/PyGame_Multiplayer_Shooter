@@ -1,14 +1,13 @@
+from frontend.PG import pg, screen
+
+
 class WorldBase:
-    def __init__(self, frameArray, pg, pgScreen, frameChangeSpeed):
+    def __init__(self, frameArray, frameChangeSpeed):
         """
         BG of the game world
         :param frameArray: An array of frames that the Image will loop over to animate
-        :param pg: PyGame Reference
-        :param pgScreen: PyGame Screen/Window Reference
         :param frameChangeSpeed: The Speed at which the frames will change
         """
-        self.pg = pg  # PyGame Reference
-        self.pgScreen = pgScreen  # PyGame Screen Reference
         self.frameChangeSpeed = frameChangeSpeed  # How many frames to wait for until we skip to the next frame
         self.CurrentGameFrame = 0  # To Keep trace of which frame we are at.
         self.CurrentFrameIndex = 0  # Current Frame in use
@@ -16,8 +15,8 @@ class WorldBase:
 
     def drawWorld(self):
         img = self.frame[self.CurrentFrameIndex]  # Get current Image from frame variable
-        img = self.pg.transform.scale(img, self.pgScreen.get_size())  # Scale it to fit display
-        self.pgScreen.blit(img, (0, 0))  # Draw it on the screen
+        img = pg.transform.scale(img, screen.get_size())  # Scale it to fit display
+        screen.blit(img, (0, 0))  # Draw it on the screen
         self.CurrentGameFrame += 1  # Increment Current Game Frame by 1
 
         if self.CurrentGameFrame >= self.frameChangeSpeed:
