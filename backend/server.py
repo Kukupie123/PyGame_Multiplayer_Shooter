@@ -27,6 +27,8 @@ sk.listen(2)  # Max 2 number of clients allowed
 
 logger.warning("Waiting For connection, Server Started ")
 
+dataSize = 5
+
 
 def threaded_client(conn, uid):
     global playersPos
@@ -55,7 +57,7 @@ def threaded_client(conn, uid):
         try:
             # If we are receiving data from client
             if conn.recv(2048) is not None:
-                receive = json.loads(conn.recv(2048).decode("utf-8"))
+                receive = json.loads(conn.recv(2048 * dataSize).decode("utf-8"))
                 action = receive['action']
                 logger.warning(f"Client {uid} requested action : {action}")
                 if action == 'get_uid':

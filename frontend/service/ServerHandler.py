@@ -3,6 +3,8 @@ import logging
 import socket
 from _thread import *
 
+dataSize = 5
+
 log = logging.getLogger("Client Network")
 
 
@@ -58,7 +60,7 @@ class ServerHandler:
         """
         while True:
             try:
-                msgRaw = self.client.recv(2048).decode()
+                msgRaw = self.client.recv(2048 * dataSize).decode()
                 print(msgRaw)
                 self.processResponse(msgRaw)
             except Exception:
@@ -87,5 +89,5 @@ class ServerHandler:
             reqStr = json.dumps(req).encode()
             self.client.send(reqStr)
             pass
-        except:
+        except Exception as e:
             print(f"Exception at ServerHandler.requestEnemiesData : {e}")

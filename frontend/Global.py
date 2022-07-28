@@ -54,7 +54,7 @@ def draws():
 def perFrameTask():
     player.move()  # Listen to player input and allows the player to move
     serverHandler.sendPlayerPos2Server(player.posX, player.posY)  # Sends the XY coordinate of the player to server
-    #serverHandler.requestEnemiesData()  # Request Enemy Data from the server
+    serverHandler.requestEnemiesData()  # Request Enemy Data from the server
     draws()  # Draws
 
 
