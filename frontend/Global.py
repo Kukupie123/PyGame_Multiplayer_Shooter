@@ -1,7 +1,6 @@
 import pygame as pg
 
 from frontend.models.characters.CharBase import CharacterBase
-from frontend.models.characters.Enemy import Enemy
 from frontend.models.worlds.WldBase import WorldBase
 
 screenSize = (800, 600)  # Set width and height
@@ -43,33 +42,20 @@ player = CharacterBase(
     },
     speed=1, window=win, piegae=pg)
 
-testEnemy = Enemy(
-    enemyFrameArray=[
-        pg.image.load("./assets/enemy/crab0.png"),
-        pg.image.load("./assets/enemy/crab1.png"),
-        pg.image.load("./assets/enemy/crab2.png"),
-        pg.image.load("./assets/enemy/crab3.png"),
-    ],
-    speed=1,
-    piegae=pg,
-    window=win,
-    animationSpeed=15,
-    spawnPoint=1
-)
-
 
 def draws():
     world.drawWorld()
-    testEnemy.draw()
+    guestService.drawOtherPlayers()
+    guestService.drawEnemies()
     player.draw()
-    guestService.drawGuests()
     pg.display.update()
 
 
 def perFrameTask():
-    player.move()
-    serverHandler.sendPosToServer(player.posX, player.posY)
-    draws()
+    player.move()  # Listen to player input and allows the player to move
+    serverHandler.sendPlayerPos2Server(player.posX, player.posY)  # Sends the XY coordinate of the player to server
+    #serverHandler.requestEnemiesData()  # Request Enemy Data from the server
+    draws()  # Draws
 
 
 def gameLoop():

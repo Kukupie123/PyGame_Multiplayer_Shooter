@@ -3,13 +3,20 @@ from _thread import *  # Import everything from thread
 import json
 import logging
 
+# Web Socket Config
+from backend.EnemyHandler import EnemyHandler
+
 server = "192.168.29.95"  # Local IP
 port = 5555
+sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Logger Config
 logger = logging.getLogger("Server")
 logger.addHandler(logging.StreamHandler())
-playersPos = {}  # clientUID : position
 
-sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Variables
+playersPos = {}  # clientUID : position. Holds all the players connected position
+enemyHandler = EnemyHandler(800, 600)  # Server code that handles enemy character of the game
 
 try:
     sk.bind((server, port))  # Open up the server
@@ -46,12 +53,11 @@ def threaded_client(conn, uid):
     # Continuously Try to receive data. If no data received we assume that the client has disconnected. A better way would be to ping and see if we get back a response
     while True:
         try:
-            logger.warning(playersPos)
             # If we are receiving data from client
             if conn.recv(2048) is not None:
                 receive = json.loads(conn.recv(2048).decode("utf-8"))
                 action = receive['action']
-                logger.info(f"Client {uid} requested action : {action}")
+                logger.warning(f"Client {uid} requested action : {action}")
                 if action == 'get_uid':
                     print(f"Initial Connection for UId {uid}")
                     response = {
@@ -60,7 +66,7 @@ def threaded_client(conn, uid):
                     }
                     conn.sendall(json.dumps(response).encode())
 
-                if action == 'update_pos':
+                elif action == 'update_pos':
                     x = receive['data']['x']
                     y = receive['data']['y']
                     playersPos[uid] = (x, y)
@@ -69,7 +75,13 @@ def threaded_client(conn, uid):
                     # Send the client all the position data of other players in the server
 
                     conn.sendall(json.dumps(response).encode())
-                    logger.info(f"updating pos for {uid} x {x} y {y} and sending back player pos dict {playersPos}")
+
+                elif action == 'get_enemy_data':
+                    dat = enemyHandler.getEnemies()  # Get the enemies data and send it to client
+                    resp = {
+                        "action": "enemy_data", "data": dat
+                    }
+                    conn.sendall(json.dumps(resp).encode())
 
         except Exception as e:
             print(f"Something Went Wrong {e}")

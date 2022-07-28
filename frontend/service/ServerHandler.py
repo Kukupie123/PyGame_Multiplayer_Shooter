@@ -44,6 +44,11 @@ class ServerHandler:
 
                 elif respParsed['action'] == 'pos_data':  # Position Data received
                     self.guestService.updatePlayerPOSSERVER(respParsed['data'])  # Update All players position
+
+                elif respParsed['action'] == 'enemy_data':  # Enemy Data received
+                    self.guestService.updateEnemyPOSServer(
+                        respParsed['data']
+                    )
         except:
             pass
 
@@ -54,21 +59,33 @@ class ServerHandler:
         while True:
             try:
                 msgRaw = self.client.recv(2048).decode()
+                print(msgRaw)
                 self.processResponse(msgRaw)
             except Exception:
                 pass
-                # print(f"Exception at listen {e}")
 
-    def sendPosToServer(self, x, y):
+    def sendPlayerPos2Server(self, x, y):
         """
         Call After updating player position, this will also receive the server's response and call processResponse Function appropriately
         """
         try:
-            resp = {
+            req = {
                 "action": "update_pos",
                 "data": {"x": x, "y": y}
             }
-            respFinal = json.dumps(resp).encode()
-            self.client.send(respFinal)
+            reqStr = json.dumps(req).encode()
+            self.client.send(reqStr)
         except socket.error as e:
             print(f"Exception at send at ClientNetwork.sendPos : {e}")
+
+    def requestEnemiesData(self):
+        """
+        Request the enemies data from the server
+        """
+        try:
+            req = {"action": "get_enemy_data"}
+            reqStr = json.dumps(req).encode()
+            self.client.send(reqStr)
+            pass
+        except:
+            print(f"Exception at ServerHandler.requestEnemiesData : {e}")
