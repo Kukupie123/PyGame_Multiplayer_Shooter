@@ -12,7 +12,7 @@ pg.display.set_icon(icon)
 # Setup Server handler (Sends request to server as well as processes responses fro the server)
 from frontend.service.GuestService import GuestService
 
-guestService = GuestService()  # Handles interacting with other players
+guestService = GuestService(pg, win)  # Handles interacting with other players
 from frontend.service.ServerHandler import ServerHandler
 
 serverHandler = ServerHandler(
@@ -29,7 +29,7 @@ world = WorldBase(frameArray=[
     pg.image.load("./assets/World/1/1_(7).png")
 ], frameChangeSpeed=30, piegae=pg, window=win)
 
-# Spawning The MAIN PLAYER --------------------------------
+# Creating The MAIN PLAYER --------------------------------
 idle = pg.image.load("./assets/aquaman1-1.png.png")  # Initialize the frames for the player
 # Creating the player Object
 player = CharacterBase(
