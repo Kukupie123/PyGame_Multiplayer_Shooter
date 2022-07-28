@@ -5,8 +5,10 @@ from _thread import *
 
 # noinspection PyMethodMayBeStatic
 class EnemyHandler:
-    def __init__(self, width, height):
-        self.spawnTimerThreshold = 12
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.spawnTimerThreshold = 1200
         self.currentSpawnTimer = 0
 
         self.moveTimerThreshold = 50
@@ -15,39 +17,40 @@ class EnemyHandler:
         self.spawnTimerActive = False
         self.moveTimerActive = False
         self.enemies = {}
-        self.EnemySpawnData = [
+        self.enemyType = ['crab', 'octopus']
+
+    def __moveEnemies(self):
+        for k, v in self.enemies.items():
+            pass
+
+    def __createEnemy(self):
+        EnemySpawnData = [
             {
                 # Enemy will spawn on random X and Top Y and will move down gradually
                 "move": 'DOWN',
-                'x': random.randint(0, width - 50),
+                'x': random.randint(0, self.x - 50),
                 'y': 0
             },
             {
                 # Enemy will spawn on random X and Bottom Y and will move up gradually
                 "move": 'UP',
-                'x': random.randint(0, width - 50),
-                'y': height - 50
+                'x': random.randint(0, self.x - 50),
+                'y': self.y - 50
             },
             {
                 # Enemy will spawn on random Y and Left X and will move Right gradually
                 "move": 'RIGHT',
                 'x': 0,
-                'y': random.randint(0, height - 50)
+                'y': random.randint(0, self.y - 50)
             },
             {
                 # Enemy will spawn on random Y and Right X and will move Left gradually
                 "move": 'LEFT',
-                'x': width - 50,
-                'y': random.randint(0, height - 50)
+                'x': self.x - 50,
+                'y': random.randint(0, self.y - 50)
             }
         ]
-        self.enemyType = ['crab', 'octopus']
-
-    def __moveEnemies(self):
-        pass
-
-    def __createEnemy(self):
-        randEnemyData = random.choice(self.EnemySpawnData)
+        randEnemyData = random.choice(EnemySpawnData)
         uid = str(uuid.uuid4())  # UID for the enemy
         # This will look like
         # {654 : {x:34, y : 0, move : LEFT, type : crab}}
@@ -57,7 +60,7 @@ class EnemyHandler:
             'move': randEnemyData['move'],
             'type': random.choice(self.enemyType)
         }
-        print(self.enemies)
+        print(f"Created Enemy at position {self.enemies[uid]['x']} {self.enemies[uid]['y']}")
 
     def startSpawnTimer(self):
         print("Spawn TIMER ACTIVE\n")
@@ -72,11 +75,10 @@ class EnemyHandler:
 
             if self.currentSpawnTimer >= self.spawnTimerThreshold:
                 # Time to spawn more enemies if its less than equal to 4
-                if len(self.enemies) < 4:
+                if len(self.enemies) < 10:
                     self.__createEnemy()
                 else:
-                    print("Already 4 Enemies exist")
-                self.currentSpawnTimer = 0
+                    self.currentSpawnTimer = 0
 
     def startMoveTimer(self):
         """
