@@ -70,3 +70,17 @@ def gameLoop():
 
 
 gameLoop()
+
+"""
+Flow of the program:
+When serverHandler object is created the constructor tries to connect to the server.
+Once successful it receives a UID which is then stored in GuestService
+The ServerHandler then starts a new thread and calls a function that runs an infinite loop and
+Listens to the server's response and processes it
+
+Every Frame we check for Key events and move the player 
+Every Frame we send essential data to the server such as current player position and a request to get the enemy positions
+
+
+
+"""

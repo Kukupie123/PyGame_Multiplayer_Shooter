@@ -1,7 +1,7 @@
 import socket
 from _thread import *  # Import everything from thread
-import json
-import logging
+import json  # JSON is how we store organise data
+import logging  # For logging
 
 # Web Socket Config
 from backend.EnemyHandler import EnemyHandler
@@ -16,7 +16,8 @@ logger.addHandler(logging.StreamHandler())
 
 # Variables
 playersPos = {}  # clientUID : position. Holds all the players connected position
-enemyHandler = EnemyHandler(800, 600)  # Server code that handles enemy character of the game
+enemyHandler = EnemyHandler(800,
+                            600)  # Server code that handles enemy character of the game, 800,600 is the Width and Height of the client
 
 try:
     sk.bind((server, port))  # Open up the server
@@ -31,6 +32,16 @@ dataSize = 5
 
 
 def threaded_clientV2(conn, uid):
+    """
+    Handles server and client interaction
+    Sends responses and receives request
+
+    NOTE: Responses are sent as array list of {action, data} dictionary
+    This increases the size of the data we transfer but I used this because of the simplicity
+    of the project and also because there was a bug that only sent the first response when we tried sending multiple response to the client
+    :param conn: the connection object of the client connected
+    :param uid: UID of the client
+    """
     global playersPos
     # On first connect send the UID to the client so that they know their UID
     resp = [
@@ -43,12 +54,13 @@ def threaded_clientV2(conn, uid):
     conn.sendall(json.dumps(resp).encode())
     logging.warning(f"{uid} connected")
 
+    # Continuously Listen to the client and talk back when requested
     while True:
 
         try:
             data = conn.recv(2048 * dataSize).decode("utf-8")  # Decoded string response
             response = []  # To store array of response to send
-            reqs = []
+            reqs = []  # Array to store the response we create to send the client
             try:
                 reqs = json.loads(conn.recv(2048 * dataSize).decode("utf-8"))  # Array of action and data dictionary
             except:
@@ -71,7 +83,8 @@ def threaded_clientV2(conn, uid):
                 if action == 'update_pos':
                     x = req['data']['x']
                     y = req['data']['y']
-                    playersPos[uid] = (x, y)
+                    playersPos[uid] = (x,
+                                       y)  # Update the dictionary key's value with the new XY value, This is why we needed UID for each client. To distinguish between them
                     resp = {"action": "pos_data", "data": playersPos}
                     response.append(resp)
 
@@ -89,11 +102,17 @@ def threaded_clientV2(conn, uid):
             print(e)
             break
     print("Lost Connection")
-    playersPos.pop(uid)
+    playersPos.pop(uid)  # Broken out of loop, Disconnect player
     conn.close()
 
 
+@DeprecationWarning  # Old method of talking to client. Works well but the bug where the server only sent first data when sending multiple data forced me to abandon this
 def threaded_client(conn, uid):
+    """
+       Should be run at a bg thread. Keeps track of a client and handles receiving and sending data
+       :param conn: The connection object obtained upon calling socket.accept(). It will hold all the connected clients
+       :param uid: The UID that was assigned by the server when accepting the connection
+       """
     global playersPos
     # on first connect send the uid
     response = {
@@ -102,11 +121,6 @@ def threaded_client(conn, uid):
     }
     conn.sendall(json.dumps(response).encode())
     logger.warning(f"Client with UID {uid} connected.")
-    """
-    Should be run at a bg thread. Keeps track of a client and handles receiving and sending data
-    :param conn: The connection object obtained upon calling socket.accept(). It will hold all the connected clients
-    :param uid: The UID that was assigned by the server when accepting the connection
-    """
 
     """
     When a player connects it has to next send it's data, the server will then store that player's data in a dictionary 
@@ -157,9 +171,12 @@ def threaded_client(conn, uid):
 
 
 while True:
-    # Continuously Look for Connection
+    # Continuously Look for Connection and accept a connection when we find one
     conn, addr = sk.accept()  # Combination of IP and Port is unique
-    uid = str(addr[0]) + str(addr[1])
-    # We start a new thread because without a thread the program is going to wait for "threaded_client" function to be done before proceeding
-    # We are going to have multiple client join at once and for each client we are going to run the threaded_client function in a different thread to not block the main thread
+    uid = str(addr[0]) + str(addr[1])  # Create a UID for every client
+
+    """
+    Start a new thread to run threaded_clientV2 because it makes use of infinite loop to
+    Keep trace of client and it's request and will block the program if run on main thread
+    """
     start_new_thread(threaded_clientV2, (conn, uid))

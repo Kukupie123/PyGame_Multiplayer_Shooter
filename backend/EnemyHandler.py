@@ -7,14 +7,17 @@ from _thread import *
 # noinspection PyMethodMayBeStatic,DuplicatedCode
 class EnemyHandler:
     def __init__(self, x, y):
-        self.width = x
-        self.height = y
-        self.spawnTimerActive = False
-        self.moveTimerActive = False
-        self.enemies = {}
-        self.enemyType = ['crab', 'octopus']
+        self.width = x  # Width of the client
+        self.height = y  # Height of the client
+        self.spawnTimerActive = False  # To keep trace if spawn timer is active or not
+        self.moveTimerActive = False  # To keep track if move timer is active or not
+        self.enemies = {}  # Store all enemies
+        self.enemyType = ['crab', 'octopus']  # Types of enemies. Used by frontend to draw the appropriate image
 
     def __clamp(self, minAllowed, maxAllowed, value):
+        """
+        Internal Helper function used to clamp a value to its min or max if it crosses it
+        """
         if value < minAllowed or value > maxAllowed:
             minDif = abs(value - minAllowed)
             maxDif = abs(value - maxAllowed)
@@ -26,7 +29,14 @@ class EnemyHandler:
         return value
 
     def __moveEnemies(self):
-        try:
+        """
+        Moves all the enemies in the list to a specific direction depending on it's
+        "move" key.
+        Enemies that spawn at the top will have its "move" set as "down" implying
+        that the char needs to move down
+        :return:
+        """
+        try:  # Since we are multi threading the elements may be deleted mid iteration
             speed = 1
             for k, v in self.enemies.items():
                 addX = 0
@@ -117,7 +127,8 @@ class EnemyHandler:
                 }
             ]
             randEnemyData = random.choice(EnemySpawnData)
-            uid = str(uuid.uuid4())  # UID for the enemy
+            uid = str(uuid.uuid4())  # Generate UID for the enemy
+            
             # This will look like
             # {654 : {x:34, y : 0, move : LEFT, type : crab}}
             self.enemies[uid] = {
