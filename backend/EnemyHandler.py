@@ -3,9 +3,10 @@ import random
 from _thread import *
 
 
+# noinspection PyMethodMayBeStatic
 class EnemyHandler:
     def __init__(self, width, height):
-        self.spawnTimerThreshold = 200
+        self.spawnTimerThreshold = 12
         self.currentSpawnTimer = 0
 
         self.moveTimerThreshold = 50
@@ -56,32 +57,39 @@ class EnemyHandler:
             'move': randEnemyData['move'],
             'type': random.choice(self.enemyType)
         }
+        print(self.enemies)
 
     def startSpawnTimer(self):
+        print("Spawn TIMER ACTIVE\n")
         """
         Needs to run in a multi thread env.
         Adds enemy to enemies list after certain interval of time
         Timer resets when an enemy is removed from the enemies list.
         Enemies are removed from list when it goes out of bound or is killed by client
         """
-        self.currentSpawnTimer += 1
+        while True:
+            self.currentSpawnTimer += 1
 
-        if self.currentSpawnTimer >= self.spawnTimerThreshold:
-            # Time to spawn more enemies
-            self.__createEnemy()
-            self.currentSpawnTimer = 0
-
-        pass
+            if self.currentSpawnTimer >= self.spawnTimerThreshold:
+                # Time to spawn more enemies if its less than equal to 4
+                if len(self.enemies) < 4:
+                    self.__createEnemy()
+                else:
+                    print("Already 4 Enemies exist")
+                self.currentSpawnTimer = 0
 
     def startMoveTimer(self):
         """
         For all the enemies in the list, it moves their position after a certain period of time
         """
-        self.currentMoveTimer += 1
+        print("Move timer ACTIVE\n")
+        while True:
 
-        if self.currentMoveTimer >= self.moveTimerThreshold:
-            self.__moveEnemies()
-            self.currentMoveTimer = 0
+            self.currentMoveTimer += 1
+
+            if self.currentMoveTimer >= self.moveTimerThreshold:
+                self.__moveEnemies()
+                self.currentMoveTimer = 0
 
     def removeEnemy(self, UID):
         """
@@ -99,10 +107,8 @@ class EnemyHandler:
         if not self.spawnTimerActive:
             self.spawnTimerActive = True
             start_new_thread(self.startSpawnTimer, ())
-            self.startSpawnTimer()
         if not self.moveTimerActive:
             self.moveTimerActive = True
-            start_new_thread(self.startMoveTimer, ())
-            self.startMoveTimer()
+            # start_new_thread(self.startMoveTimer, ())
 
         return self.enemies

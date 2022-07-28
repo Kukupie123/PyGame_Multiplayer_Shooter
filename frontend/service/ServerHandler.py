@@ -26,6 +26,7 @@ class ServerHandler:
         try:
             self.client.connect(self.addr)  # try to connect
             # Continuously Listen for server's response
+            self.client.recv(2048*dataSize).decode()
             start_new_thread(self.multi_listen, ())
         except Exception as e:
             print(f"Exception when trying to connect to server in clientNetwork.connect {e}")

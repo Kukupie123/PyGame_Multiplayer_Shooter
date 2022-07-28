@@ -44,42 +44,49 @@ def threaded_clientV2(conn, uid):
     logging.warning(f"{uid} connected")
 
     while True:
+
         try:
-            if conn.recv(2048*dataSize) is not None:
-                response = []
+            data = conn.recv(2048 * dataSize).decode("utf-8")  # Decoded string response
+            response = []  # To store array of response to send
+            reqs = []
+            try:
                 reqs = json.loads(conn.recv(2048 * dataSize).decode("utf-8"))  # Array of action and data dictionary
+            except:
+                if data is not None:  # Non parsable data but client is still connected
+                    continue
 
-                # For each action we want to create a response action dictionary and at the end of iteration send it
-                for req in reqs:
-                    action = req['action']
+            # For each action we want to create a response action dictionary and at the end of iteration send it
+            for req in reqs:
+                action = req['action']
 
-                    # If client wants their UID
-                    if action == 'get_uid':
-                        resp = {
-                            "action": "uid",
-                            "data": uid
-                        }
-                        response.append(resp)
+                # If client wants their UID
+                if action == 'get_uid':
+                    resp = {
+                        "action": "uid",
+                        "data": uid
+                    }
+                    response.append(resp)
 
-                    # If client wants to update it's position
-                    if action == 'update_pos':
-                        x = req['data']['x']
-                        y = req['data']['y']
-                        playersPos[uid] = (x, y)
-                        resp = {"action": "pos_data", "data": playersPos}
-                        response.append(resp)
+                # If client wants to update it's position
+                if action == 'update_pos':
+                    x = req['data']['x']
+                    y = req['data']['y']
+                    playersPos[uid] = (x, y)
+                    resp = {"action": "pos_data", "data": playersPos}
+                    response.append(resp)
 
-                    # If client wants to get enemy data
-                    if action == 'get_enemy_data':
-                        dat = enemyHandler.getEnemies()  # Get the enemies data and send it to client
-                        resp = {
-                            "action": "enemy_data", "data": dat
-                        }
-                        response.append(resp)
+                # If client wants to get enemy data
+                if action == 'get_enemy_data':
+                    dat = enemyHandler.getEnemies()  # Get the enemies data and send it to client
+                    resp = {
+                        "action": "enemy_data", "data": dat
+                    }
+                    response.append(resp)
 
-                # Once iteration over we are going to send the response array of action&Data as string
-                conn.sendall(json.dumps(response).encode())
-        except:
+            # Once iteration over we are going to send the response array of action&Data as string
+            conn.sendall(json.dumps(response).encode())
+        except Exception as e:
+            print(e)
             break
     print("Lost Connection")
     playersPos.pop(uid)
