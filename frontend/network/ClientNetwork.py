@@ -1,5 +1,8 @@
 import socket
 import json
+import logging
+
+log = logging.getLogger("Client Network")
 
 
 class ClientNetwork:
@@ -31,9 +34,12 @@ class ClientNetwork:
         if decodedResp is not None:
 
             respParsed = json.loads(decodedResp)  # Parse the Raw response to dict
+            log.warning(f"Server sent response : {respParsed}")
             if respParsed['action'] == 'uid':
                 self.uid = respParsed['data']
-                print(f"UID Set to {self.uid}")
+                log.warning(f"UID Set to {self.uid}")
+            elif respParsed['action'] == 'pos_data':
+                pass
 
     def sendPosToServer(self, x, y):
         """

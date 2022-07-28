@@ -31,7 +31,7 @@ class CharacterBase:
         """
         Draws the current image on the screen based on posX and posY value
         """
-        print(f"Drawing Player at location : {self.posX} and {self.posY}")
+        # print(f"Drawing Player at location : {self.posX} and {self.posY}")
         self.gameScreen.blit(self.currentFrame, (self.posX, self.posY))  # Draw character at current position
 
     def move(self):
@@ -63,24 +63,33 @@ class CharacterBase:
         # No Left/Right Movement
         if x == 0:
             if y == 0:
-                print("Idle")
+                pass
+                #print("Idle")
             elif y < 0:
-                print("Up")
+                pass
+                #print("Up")
             elif y > 0:
-                print("Down")
+                pass
+                #print("Down")
         # Right Movement
         elif x > 0:
             if y == 0:
-                print("Right")
+                pass
+                #print("Right")
             elif y < 0:
-                print("Top Right")
+                pass
+                #print("Top Right")
             elif y > 0:
-                print("Bottom Right")
+                pass
+                #print("Bottom Right")
         # Left Movement
         elif x < 0:
             if y == 0:
-                print("Left")
+                pass
+                #print("Left")
             elif y < 0:
-                print("Top Left")
+                pass
+                #print("Top Left")
             elif y > 0:
-                print("Bottom Left")
+                pass
+                #print("Bottom Left")
