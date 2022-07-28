@@ -1,13 +1,11 @@
-from frontend.PG import pg, screen
-
-
 class CharacterBase:
     def __init__(self,
-                 frameDict, speed):
+                 frameDict, speed, piegae, window):
+
         """
-        When creating a character you need to supply all the necessary frames
+        When creating a characters you need to supply all the necessary frames
         :param frameDict: Dictionary of your Character state images named appropriately as idle,top,down,left,right (Type must be of pygame.SurfaceType)
-        :param speed: speed of the character movement
+        :param speed: speed of the characters movement
         """
 
         # Image dictionary setup with the necessary image
@@ -18,10 +16,12 @@ class CharacterBase:
             "left": frameDict['left'],
             "right": frameDict['right']
         }
+        self.pg = piegae
+        self.window = window
         # Setup Additional Data
         self.speed = speed  # Speed of player
-        self.posX = (screen.get_size()[0]) / 2
-        self.posY = (screen.get_size()[1]) / 2
+        self.posX = (self.window.get_size()[0]) / 2
+        self.posY = (self.window.get_size()[1]) / 2
         self.currentFrame = self.frame['idle']
 
     def draw(self):
@@ -29,7 +29,7 @@ class CharacterBase:
         Draws the current image on the screen based on posX and posY value
         """
         # print(f"Drawing Player at location : {self.posX} and {self.posY}")
-        screen.blit(self.currentFrame, (self.posX, self.posY))  # Draw character at current position
+        self.window.blit(self.currentFrame, (self.posX, self.posY))  # Draw characters at current position
 
     def updatePos(self, x, y):
         """
@@ -42,20 +42,20 @@ class CharacterBase:
 
     def move(self):
         """
-        Checks keys dictionary of PyGame and uses it to update posX and posY value of character.
-        Do NOT forget to call draw to draw the character with the updated location data
+        Checks keys dictionary of PyGame and uses it to update posX and posY value of characters.
+        Do NOT forget to call draw to draw the characters with the updated location data
         """
-        keys = pg.key.get_pressed()  # Key active dict
+        keys = self.pg.key.get_pressed()  # Key active dict
 
-        if keys[pg.K_LEFT]:
+        if keys[self.pg.K_LEFT]:
             x = -1
-        elif keys[pg.K_RIGHT]:
+        elif keys[self.pg.K_RIGHT]:
             x = 1
         else:
             x = 0
-        if keys[pg.K_UP]:
+        if keys[self.pg.K_UP]:
             y = -1
-        elif keys[pg.K_DOWN]:
+        elif keys[self.pg.K_DOWN]:
             y = 1
         else:
             y = 0

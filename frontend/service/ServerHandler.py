@@ -7,13 +7,13 @@ log = logging.getLogger("Client Network")
 
 
 # noinspection PyMethodMayBeStatic
-class ClientNetwork:
-    def __init__(self, gms):
+class ServerHandler:
+    def __init__(self, guestService):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "192.168.29.95"
         self.port = 5555
         self.addr = (self.server, self.port)
-        self.gms = gms
+        self.guestService = guestService
         self.connect()  # Once we successfully connect we are going to continuously listen.
 
     def connect(self):
@@ -30,19 +30,22 @@ class ClientNetwork:
             print(f"Exception when trying to connect to server in clientNetwork.connect {e}")
 
     def processResponse(self, decodedResp):
-        """
-        Listens to the server and when ever we get a response we try to parse it
-        Parses the decodedString and performs appropriate action based on the action
-        """
-        if decodedResp is not None:
+        try:
+            """
+            Listens to the server and when ever we get a response we try to parse it
+            Parses the decodedString and performs appropriate action based on the action
+            """
+            if decodedResp is not None:
 
-            respParsed = json.loads(decodedResp)  # Parse the Raw response to dict
-            log.info(f"Server sent response : {respParsed}")
-            if respParsed['action'] == 'uid':  # Update the Client UID
-                self.gms.UID = respParsed['data']
+                respParsed = json.loads(decodedResp)  # Parse the Raw response to dict
+                log.info(f"Server sent response : {respParsed}")
+                if respParsed['action'] == 'uid':  # Update the Client UID
+                    self.guestService.UID = respParsed['data']
 
-            elif respParsed['action'] == 'pos_data':  # Position Data received
-                self.gms.updatePlayerPOSSERVER(respParsed['data'])  # Update All players position
+                elif respParsed['action'] == 'pos_data':  # Position Data received
+                    self.guestService.updatePlayerPOSSERVER(respParsed['data'])  # Update All players position
+        except:
+            pass
 
     def multi_listen(self):
         """
