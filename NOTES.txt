@@ -1,2 +1,0 @@
-Things that I need to figure out
-1. Taking input and moving characters in screen
