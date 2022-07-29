@@ -5,6 +5,7 @@ import logging  # For logging
 
 # Web Socket Config
 from backend.EnemyHandler import EnemyHandler
+from backend.WeaponHandler import WeaponHandler
 
 server = "192.168.29.95"  # Local IP
 port = 5555
@@ -18,6 +19,9 @@ logger.addHandler(logging.StreamHandler())
 playersPos = {}  # clientUID : position. Holds all the players connected position
 enemyHandler = EnemyHandler(800,
                             600)  # Server code that handles enemy character of the game, 800,600 is the Width and Height of the client
+
+# Handle Interaction related to bullets, enemies and the player who fired it
+weaponHandler = WeaponHandler(enemyHandler=enemyHandler)
 
 try:
     sk.bind((server, port))  # Open up the server
@@ -69,15 +73,8 @@ def threaded_clientV2(conn, uid):
 
             # For each action we want to create a response action dictionary and at the end of iteration send it
             for req in reqs:
+                # ACTIONS THAT CLIENT SEND AND SERVER UPDATES ---------------
                 action = req['action']
-
-                # If client wants their UID
-                if action == 'get_uid':
-                    resp = {
-                        "action": "uid",
-                        "data": uid
-                    }
-                    response.append(resp)
 
                 # If client wants to update it's position
                 if action == 'update_pos':
@@ -85,7 +82,24 @@ def threaded_clientV2(conn, uid):
                     y = req['data']['y']
                     playersPos[uid] = (x,
                                        y)  # Update the dictionary key's value with the new XY value, This is why we needed UID for each client. To distinguish between them
+
+                # If client shot a bullet
+                if action == 'shoot':
+                    data = req['data']  # {x,y}
+                    weaponHandler.updateBulletData(
+                        (data['x'], data['y'], uid))  # Update the bullet position in weapon handler for the client
+
+                # Client wants position data of player
+                if action == 'get_player_pos':
                     resp = {"action": "pos_data", "data": playersPos}
+                    response.append(resp)
+
+                # If client wants their UID
+                if action == 'get_uid':
+                    resp = {
+                        "action": "uid",
+                        "data": uid
+                    }
                     response.append(resp)
 
                 # If client wants to get enemy data

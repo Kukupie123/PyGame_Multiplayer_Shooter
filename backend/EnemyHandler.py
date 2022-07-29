@@ -128,7 +128,7 @@ class EnemyHandler:
             ]
             randEnemyData = random.choice(EnemySpawnData)
             uid = str(uuid.uuid4())  # Generate UID for the enemy
-            
+
             # This will look like
             # {654 : {x:34, y : 0, move : LEFT, type : crab}}
             self.enemies[uid] = {

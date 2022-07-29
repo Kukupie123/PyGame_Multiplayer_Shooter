@@ -72,7 +72,8 @@ class ServerHandler:
             print(f"{playerXYTuple[0]} {playerXYTuple[1]}")
             playerPOS = {"action": "update_pos", "data": {"x": playerXYTuple[0], "y": playerXYTuple[1]}}
             reqEnemyData = {"action": "get_enemy_data"}
-            reqs = [playerPOS, reqEnemyData]
+            reqPlayerPOSData = {"action": "get_player_pos"}
+            reqs = [playerPOS, reqEnemyData, reqPlayerPOSData]
             reqStr = json.dumps(reqs)
             self.client.send(reqStr.encode())
         except Exception as e:
