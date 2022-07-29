@@ -1,7 +1,7 @@
 # Aqua Mayhem Multiplayer
 2D Top down Multiplayer game using PyGame
-And bare bone python's socket for the backend
-Fairly easy, the hard part was the multiplayer and making everything sync up perfectly with each other
+And bare bone python's socket for the backend.
+Fairly easy, the hard part was the multiplayer and making everything sync up perfectly with each client.
 It's not perfect, no where close To being perfect
 But I am fairly okay with the result so decided to stop after few tweaks
 
