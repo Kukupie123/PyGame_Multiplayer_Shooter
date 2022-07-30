@@ -6,10 +6,7 @@ from frontend.models.worlds.WldBase import WorldBase
 screenSize = (800, 600)  # Set width and height
 pg.init()  # initialize pygame
 win = pg.display.set_mode(screenSize)  # Setup Screen
-# icon = pg.image.load("./assets/aquaman1-1.png.png")  # Load Icon
-# pg.display.set_icon(icon)
 
-# Setup Server handler (Sends request to server as well as processes responses fro the server)
 from frontend.service.GuestService import GuestService
 
 guestService = GuestService(pg, win)  # Handles interacting with other players
@@ -23,7 +20,9 @@ from frontend.service.ServerHandler import ServerHandler
 serverHandler = ServerHandler(
     guestService=guestService,
     effectService=effectService)  # Creates object, connects to internet and starts listening to server for processing
-# We pass guestService because it needs to interact with it
+# We pass guestService because it needs to interact with it, same goes for effectService
+
+# Creating LEVEL ----------------------------------------
 
 world = WorldBase(frameArray=[
     pg.image.load("./assets/World/1/1_(1).png"),
@@ -54,6 +53,9 @@ player = CharacterBase(
 
 
 def draws():
+    """
+    Draws several entities on the screen when called
+    """
     world.drawWorld()
     guestService.drawOtherPlayers()
     guestService.drawEnemies()
@@ -64,8 +66,12 @@ def draws():
 
 
 def perFrameTask():
+    """
+    Tasks that need to be performed every frame
+    """
     player.listenInput()  # Listen to player input and allows the player to move
-    serverHandler.sendEssentialData((player.posX, player.posY))
+    serverHandler.sendEssentialData(
+        (player.posX, player.posY))  # Send players position to the server and request enemies position
     draws()  # Draws
 
 
@@ -77,25 +83,14 @@ def gameLoop():
             if e.type == pg.QUIT:
                 running = False
                 pg.quit()
+
+            # If we press mouse down. We are shooting.
             if e.type == pg.MOUSEBUTTONDOWN:
-                pos = pg.mouse.get_pos()
-                serverHandler.sendShoot(pos[0], pos[1])
+                pos = pg.mouse.get_pos()  # Store position of the mouse
+                serverHandler.sendShoot(pos[0],
+                                        pos[1])  # call sendShoot function and pass XY coordinate of the mouse position
 
         perFrameTask()
 
 
-gameLoop()
-
-"""
-Flow of the program:
-When serverHandler object is created the constructor tries to connect to the server.
-Once successful it receives a UID which is then stored in GuestService
-The ServerHandler then starts a new thread and calls a function that runs an infinite loop and
-Listens to the server's response and processes it
-
-Every Frame we check for Key events and move the player 
-Every Frame we send essential data to the server such as current player position and a request to get the enemy positions
-
-
-
-"""
+gameLoop()  # Start the main game loop

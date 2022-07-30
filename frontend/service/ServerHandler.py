@@ -92,6 +92,7 @@ class ServerHandler:
 
     def sendShoot(self, x, y):
         try:
+            # Create response array with only one dictionary element and then send it
             request2send = [{"action": "shoot", "data": {"x": x, "y": y}}]
             self.client.send(json.dumps(request2send).encode())
         except:

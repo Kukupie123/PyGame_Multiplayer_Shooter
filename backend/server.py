@@ -16,9 +16,9 @@ logger.addHandler(logging.StreamHandler())
 
 # Variables
 playersPos = {}  # clientUID : position. Holds all the players connected position
-connections = []
+connections = []  # Clients object that are connected are stored here
 enemyHandler = EnemyHandler(800,
-                            600)  # Server code that handles enemy character of the game, 800,600 is the Width and Height of the client
+                            600)  # Server code that handles enemy spawn, move and kill from bullet
 
 try:
     sk.bind((server, port))  # Open up the server
@@ -32,8 +32,13 @@ logger.warning("Waiting For connection, Server Started ")
 dataSize = 5
 
 
-
 def broadcaster(action, data):
+    """
+       Broadcasts the message to all the connected client
+       :param action: the action we want to send
+       :param action: the action we want to send
+       :param data: the data we want to send
+       """
     print(f"Broadcasting {action} with data {data}")
 
     resp = [{
@@ -119,7 +124,6 @@ def threaded_clientV2(conn, uid):
                                      ("shoot",
                                       {"x": req['data']['x'], "y": req['data']['y'], "id": uid})
                                      )  # Start Broadcasting the message
-
 
                 # ACTIONS THAT CLIENT REQUEST AND SERVER SENDS-----------------
 

@@ -17,7 +17,7 @@ class GuestService:
         self.win = win
 
         # Bullets
-        self.shootMaxDuration = 100
+        self.shootMaxDuration = 70
         self.shootingPlayer = {}  # {uid : {canShoot:false/true, x:13,y:234, currentDuration : 0}}
 
     def updatePlayerPOSSERVER(self, pos_dic):  # {uid : (x,y)}
@@ -39,7 +39,7 @@ class GuestService:
             if canShoot:
                 if duration < self.shootMaxDuration:
                     self.pg.draw.line(self.win, (0, 0, 0), (self.players[k].posX, self.players[k].posY),
-                                      (v['x'], v['y']))
+                                      (v['x'], v['y']), 4)
                     duration += 1
                 else:
                     duration = 0
@@ -111,7 +111,6 @@ class GuestService:
                 self.enemies[k].draw()
         except:
             pass
-
 
     def drawOtherPlayers(self):
         try:
