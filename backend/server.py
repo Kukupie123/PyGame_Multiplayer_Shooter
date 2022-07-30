@@ -32,6 +32,8 @@ logger.warning("Waiting For connection, Server Started ")
 dataSize = 5
 
 
+# TODO: Better hit detection by taking the center of image for enemies
+
 def broadcaster(action, data):
     print(f"Broadcasting {action} with data {data}")
 
@@ -119,7 +121,6 @@ def threaded_clientV2(conn, uid):
                                       {"x": req['data']['x'], "y": req['data']['y'], "id": uid})
                                      )  # Start Broadcasting the message
 
-                    # TODO : Delete enemies that are in this mark
 
                 # ACTIONS THAT CLIENT REQUEST AND SERVER SENDS-----------------
 

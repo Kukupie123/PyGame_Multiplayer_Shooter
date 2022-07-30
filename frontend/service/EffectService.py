@@ -6,7 +6,6 @@ class EffectService:
 
         self.boomFrameDuration = 12
         self.booms = []  # [ {x,y}]
-        # TODO: Offset explosions properly
         self.smallBoom = [
             self.pg.image.load("../frontend/assets/effects/explosion/bom00.png"),
             self.pg.image.load("../frontend/assets/effects/explosion/bom01.png"),

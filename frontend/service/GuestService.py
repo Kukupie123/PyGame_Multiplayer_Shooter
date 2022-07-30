@@ -100,6 +100,8 @@ class GuestService:
         except:
             pass
 
+    # TODO: Stop drawing player
+
     def drawOtherPlayers(self):
         try:
             for k, v in self.pos_dic.items():

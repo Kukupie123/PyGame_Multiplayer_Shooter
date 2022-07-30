@@ -88,6 +88,7 @@ class CharacterBase:
             elif y > 0:
                 self.currentFrame = self.frame['left']
 
+    # TODO : Better animation system
     def draw(self):
         """
         Draws the current image on the screen based on posX and posY value
