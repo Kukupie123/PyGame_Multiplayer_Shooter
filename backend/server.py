@@ -32,7 +32,6 @@ logger.warning("Waiting For connection, Server Started ")
 dataSize = 5
 
 
-# TODO: Better hit detection by taking the center of image for enemies
 
 def broadcaster(action, data):
     print(f"Broadcasting {action} with data {data}")

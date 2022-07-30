@@ -112,7 +112,6 @@ class GuestService:
         except:
             pass
 
-    # TODO: Add scoring system
 
     def drawOtherPlayers(self):
         try:
