@@ -57,7 +57,7 @@ class ServerHandler:
                     self.guestService.updateShoot(idd=respParsed['data']['id'], x=respParsed['data']['x'],
                                                   y=respParsed['data']['y'])
                 elif respParsed['action'] == 'kill':  # A kill has been triggered
-
+                    self.effectService.incrementScore()
                     kills = respParsed['data']  # List of dict
                     print(f"ENEMY DEAD! {kills}")
                     for k in kills:

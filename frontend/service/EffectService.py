@@ -3,7 +3,6 @@ class EffectService:
     def __init__(self, pg, win):
         self.pg = pg
         self.win = win
-
         self.boomFrameDuration = 12
         self.booms = []  # [ {x,y}]
         self.smallBoom = [
@@ -37,7 +36,12 @@ class EffectService:
             self.pg.image.load("../frontend/assets/nuke/Layer 1_sprite_14.png"),
             self.pg.image.load("../frontend/assets/nuke/Layer 1_sprite_15.png"),
             self.pg.image.load("../frontend/assets/nuke/Layer 1_sprite_16.png"),
+
         ]
+
+        self.scoreFont = self.pg.font.Font('freesansbold.ttf', 32)
+        self.score = 0
+        self.scoreText = self.scoreFont.render("Score : " + str(self.score), False, (0, 0, 0))
 
     def addBoom(self, x, y, boomType):
         self.booms.append({
@@ -48,7 +52,15 @@ class EffectService:
             'duration': 0
         })
 
+    def incrementScore(self):
+        self.score += 1
+        self.scoreText = self.scoreFont.render("Score : " + str(self.score), False, (0, 0, 0))
+
     def draw(self):
+        width = self.win.get_size()[0]
+        height = self.win.get_size()[1]
+        self.win.blit(self.scoreText, (width / 2, 20))
+
         for boom in self.booms:
             frame = boom['frameIndex']
             duration = boom['duration']

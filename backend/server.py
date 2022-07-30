@@ -49,7 +49,7 @@ def broadcaster(action, data):
         except:
             pass
 
-    kills = enemyHandler.enemyHit(data['x'], data['y'], 25)  # [x,y,type]
+    kills = enemyHandler.enemyHit(data['x'], data['y'], 50)  # [x,y,type]
     if len(kills) > 0:
         start_new_thread(broadcaster, ("kill", kills))
 
