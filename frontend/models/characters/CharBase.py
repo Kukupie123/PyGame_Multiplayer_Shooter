@@ -1,7 +1,7 @@
 # noinspection PyMethodMayBeStatic
 
 
-# noinspection PyMethodMayBeStatic
+# noinspection PyMethodMayBeStatic,DuplicatedCode
 class CharacterBase:
     def __init__(self,
                  frameDict, speed, piegae, window):
@@ -43,21 +43,7 @@ class CharacterBase:
                 return minAllowed
         return value
 
-    def __updateFrame(self):
-        xDelta = self.posX - self.lastX  # positive EG if going to right, negative if going to left, 0 if no movement
-        yDelta = self.posY - self.lastY  # 20-10 (going down) positive if going to down, negative if going up, 0 if no movement
-        x = 0
-        if xDelta > 0:
-            x = 1
-        elif xDelta < 0:
-            x = -1
-
-        y = 0
-        if yDelta > 0:
-            y = 1
-        elif yDelta < 0:
-            y = -1
-
+    def __updateFrame(self, x, y):
         # Update the Frame based on XY values
 
         # No Left/Right Movement
@@ -88,15 +74,14 @@ class CharacterBase:
             elif y > 0:
                 self.currentFrame = self.frame['left']
 
-    # TODO : Better animation system
     def draw(self):
         """
         Draws the current image on the screen based on posX and posY value
         """
         # print(f"Drawing Player at location : {self.posX} and {self.posY}")
-        self.__updateFrame()
         self.window.blit(self.currentFrame, (self.posX, self.posY))  # Draw characters at current position
 
+    # noinspection SpellCheckingInspection
     def updatePos(self, x, y):
         """
         Update the character's position directly instead of adding input
@@ -104,11 +89,23 @@ class CharacterBase:
         :param y: the y value
         """
 
-        self.lastX = self.posX
-        self.lastY = self.lastY
+        xAxis = 0
+        yAxis = 0
+        if not (self.posX == x and self.posY == y):
+            if x > 0:
+                xAxis = 1
+            else:
+                x = -1
+
+            if y > 0:
+                yAxis = 1
+            else:
+                yAxis = -1
 
         self.posX = x
         self.posY = y
+
+        # self.__updateFrame(xAxis, yAxis)
 
     def listenInput(self):
         """
@@ -140,3 +137,33 @@ class CharacterBase:
 
         self.posY = self.__clamp(minAllowed=0, maxAllowed=self.window.get_size()[1] - 50, value=self.posY)
         self.posX = self.__clamp(minAllowed=0, maxAllowed=self.window.get_size()[0] - 50, value=self.posX)
+
+        # Update the Frame based on XY values
+
+        # No Left/Right Movement
+        if x == 0:
+            if y == 0:
+                self.currentFrame = self.frame['idle']
+            elif y < 0:
+                self.currentFrame = self.frame['top']
+            elif y > 0:
+                pass
+                self.currentFrame = self.frame['down']
+        # Right Movement
+        elif x > 0:
+            if y == 0:
+                self.currentFrame = self.frame['right']
+            elif y < 0:
+                self.currentFrame = self.frame['right']
+            elif y > 0:
+                self.currentFrame = self.frame['right']
+        # Left Movement
+        elif x < 0:
+            if y == 0:
+                pass
+                self.currentFrame = self.frame['left']
+            elif y < 0:
+                pass
+                self.currentFrame = self.frame['left']
+            elif y > 0:
+                self.currentFrame = self.frame['left']

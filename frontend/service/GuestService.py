@@ -65,26 +65,38 @@ class GuestService:
         """
         self.enemy_data = enemy_data
 
-    def __createEnemy(self):
-        testEnemy = Enemy(
-            enemyFrameArray=[
-                self.pg.image.load("../frontend/assets/enemy/crab0.png"),
-                self.pg.image.load("../frontend/assets/enemy/crab1.png"),
-                self.pg.image.load("../frontend/assets/enemy/crab2.png"),
-                self.pg.image.load("../frontend/assets/enemy/crab3.png"),
-            ],
-            speed=1,
-            piegae=self.pg,
-            window=self.win,
-            animationSpeed=15,
-        )
+    def __createEnemy(self, etype):
+        if etype == 'octo':
+            testEnemy = Enemy(
+                enemyFrameArray=[
+                    self.pg.image.load("../frontend/assets/char/octu/sprite_0.png"),
+                    self.pg.image.load("../frontend/assets/char/octu/sprite_1.png"),
+                ],
+                speed=1,
+                piegae=self.pg,
+                window=self.win,
+                animationSpeed=15,
+            )
+        else:
+            testEnemy = Enemy(
+                enemyFrameArray=[
+                    self.pg.image.load("../frontend/assets/char/crab/sprite_0.png"),
+                    self.pg.image.load("../frontend/assets/char/crab/sprite_1.png"),
+                    self.pg.image.load("../frontend/assets/char/crab/sprite_2.png"),
+                    self.pg.image.load("../frontend/assets/char/crab/sprite_3.png"),
+                ],
+                speed=1,
+                piegae=self.pg,
+                window=self.win,
+                animationSpeed=15,
+            )
         return testEnemy
 
     def drawEnemies(self):
         try:
             for k, v in self.enemy_data.items():
                 if k not in self.enemies:  # If enemy we iterated over is not in the enemies list
-                    self.enemies[k] = self.__createEnemy()
+                    self.enemies[k] = self.__createEnemy(v['etype'])
 
                 # Update the position of the enemies
                 self.enemies[k].updatePos(v['x'], v['y'])
@@ -100,7 +112,7 @@ class GuestService:
         except:
             pass
 
-    # TODO: Stop drawing player
+    # TODO: Add scoring system
 
     def drawOtherPlayers(self):
         try:
@@ -139,7 +151,8 @@ class GuestService:
                     self.players.pop(k)
 
             # Draw each players now
-            for k in self.players:
-                self.players[k].draw()
+            for k, v in self.players.items():
+                if self.UID != k:
+                    self.players[k].draw()
         except:
             pass

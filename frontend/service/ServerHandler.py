@@ -61,7 +61,8 @@ class ServerHandler:
                     kills = respParsed['data']  # List of dict
                     print(f"ENEMY DEAD! {kills}")
                     for k in kills:
-                        self.effectService.addBoom(k['x'], k['y'], k['type'])
+                        bt = "small" if k['type'] == 'crab' else "nuke"
+                        self.effectService.addBoom(k['x'], k['y'], bt)
         except Exception as e:
             print(e)
 

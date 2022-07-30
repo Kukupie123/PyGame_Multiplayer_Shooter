@@ -12,7 +12,7 @@ class EnemyHandler:
         self.spawnTimerActive = False  # To keep trace if spawn timer is active or not
         self.moveTimerActive = False  # To keep track if move timer is active or not
         self.enemies = {}  # Store all enemies
-        self.enemyType = ['crab', 'octopus']  # Types of enemies. Used by frontend to draw the appropriate image
+        self.enemyType = ['crab', 'octo']  # Types of enemies. Used by frontend to draw the appropriate image
 
     def __clamp(self, minAllowed, maxAllowed, value):
         """
