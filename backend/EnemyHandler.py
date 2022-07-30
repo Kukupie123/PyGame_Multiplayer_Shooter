@@ -4,7 +4,7 @@ import uuid
 from _thread import *
 
 
-# noinspection PyMethodMayBeStatic,DuplicatedCode
+# noinspection PyMethodMayBeStatic,DuplicatedCode,PyUnboundLocalVariable
 class EnemyHandler:
     def __init__(self, x, y):
         self.width = x  # Width of the client
@@ -195,12 +195,12 @@ class EnemyHandler:
     def enemyHit(self, x, y, acceptedRange):
         kills = []
         try:
-            hitLocSum = abs(x + y)
             for k, v in self.enemies.items():
-                print(self.enemies[k])
-                enemyLocSum = abs(v['x'] + v['y'])
-                dif = abs(enemyLocSum - hitLocSum)
-                if dif < acceptedRange:
+                enemyX = v['x'] + 20
+                enemyY = v['y'] + 20
+                difX = abs(enemyX - x)
+                difY = abs(enemyY - y)
+                if difX < acceptedRange and difY < acceptedRange:
                     # Delete the enemy
                     hitX = v['x']
                     hitY = v['y']
