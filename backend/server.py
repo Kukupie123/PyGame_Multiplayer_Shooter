@@ -1,11 +1,10 @@
-import socket
-from _thread import *  # Import everything from thread
 import json  # JSON is how we store organise data
 import logging  # For logging
+import socket
+from _thread import *  # Import everything from thread
 
 # Web Socket Config
 from backend.EnemyHandler import EnemyHandler
-from backend.WeaponHandler import WeaponHandler
 
 server = "192.168.29.95"  # Local IP
 port = 5555
@@ -17,11 +16,9 @@ logger.addHandler(logging.StreamHandler())
 
 # Variables
 playersPos = {}  # clientUID : position. Holds all the players connected position
+connections = []
 enemyHandler = EnemyHandler(800,
                             600)  # Server code that handles enemy character of the game, 800,600 is the Width and Height of the client
-
-# Handle Interaction related to bullets, enemies and the player who fired it
-weaponHandler = WeaponHandler(enemyHandler=enemyHandler)
 
 try:
     sk.bind((server, port))  # Open up the server
@@ -35,6 +32,27 @@ logger.warning("Waiting For connection, Server Started ")
 dataSize = 5
 
 
+def broadcaster(action, data):
+    print(f"Broadcasting {action} with data {data}")
+
+    resp = [{
+        "action": action,
+        "data": data
+    }]
+
+    respStr = json.dumps(resp).encode()
+    for conn in connections:
+        try:
+            conn.sendall(respStr)
+        except:
+            pass
+
+    kills = enemyHandler.enemyHit(data['x'], data['y'], 25)  # [x,y,type]
+    if len(kills) > 0:
+        start_new_thread(broadcaster, ("kill", kills))
+
+
+# noinspection PyTypeChecker
 def threaded_clientV2(conn, uid):
     """
     Handles server and client interaction
@@ -43,6 +61,8 @@ def threaded_clientV2(conn, uid):
     NOTE: Responses are sent as array list of {action, data} dictionary
     This increases the size of the data we transfer but I used this because of the simplicity
     of the project and also because there was a bug that only sent the first response when we tried sending multiple response to the client
+
+    NOTE: CLIENT MUST ALWAYS SEND AN ARRAY JSON EG: [{action:move}]
     :param conn: the connection object of the client connected
     :param uid: UID of the client
     """
@@ -72,30 +92,45 @@ def threaded_clientV2(conn, uid):
                     continue
 
             # For each action we want to create a response action dictionary and at the end of iteration send it
-            for req in reqs:
+            for req in reqs:  # {action, data : {}}
                 # ACTIONS THAT CLIENT SEND AND SERVER UPDATES ---------------
                 action = req['action']
 
                 # If client wants to update it's position
-                if action == 'update_pos':
+                if action == 'update_pos':  # action, data : {x,y}
                     x = req['data']['x']
                     y = req['data']['y']
                     playersPos[uid] = (x,
                                        y)  # Update the dictionary key's value with the new XY value, This is why we needed UID for each client. To distinguish between them
 
-                # If client shot a bullet
-                if action == 'shoot':
-                    data = req['data']  # {x,y}
-                    weaponHandler.updateBulletData(
-                        (data['x'], data['y'], uid))  # Update the bullet position in weapon handler for the client
+                elif action == 'shoot':  # action, data : {x,y}
+                    print("SHOTTTTTTTTTTTTTTTTTTT")
+                    """
+                    Send a broadcast to all client
+                    action : shoot
+                    data : {
+                    x : x
+                    y : y
+                    uid : shootersID
+                    }
+                    """
+
+                    start_new_thread(broadcaster,
+                                     ("shoot",
+                                      {"x": req['data']['x'], "y": req['data']['y'], "id": uid})
+                                     )  # Start Broadcasting the message
+
+                    # TODO : Delete enemies that are in this mark
+
+                # ACTIONS THAT CLIENT REQUEST AND SERVER SENDS-----------------
 
                 # Client wants position data of player
-                if action == 'get_player_pos':
+                elif action == 'get_player_pos':
                     resp = {"action": "pos_data", "data": playersPos}
                     response.append(resp)
 
                 # If client wants their UID
-                if action == 'get_uid':
+                elif action == 'get_uid':
                     resp = {
                         "action": "uid",
                         "data": uid
@@ -104,19 +139,21 @@ def threaded_clientV2(conn, uid):
 
                 # If client wants to get enemy data
                 if action == 'get_enemy_data':
-                    dat = enemyHandler.getEnemies()  # Get the enemies data and send it to client
+                    enemies = enemyHandler.getEnemies()  # Get the enemies data and send it to client
                     resp = {
-                        "action": "enemy_data", "data": dat
+                        "action": "enemy_data", "data": enemies
                     }
                     response.append(resp)
 
-            # Once iteration over we are going to send the response array of action&Data as string
+                # Once iteration over we are going to send the response array of action&Data as string
             conn.sendall(json.dumps(response).encode())
         except Exception as e:
             print(e)
             break
     print("Lost Connection")
     playersPos.pop(uid)  # Broken out of loop, Disconnect player
+    global connections
+    connections.remove(conn)
     conn.close()
 
 
@@ -193,4 +230,5 @@ while True:
     Start a new thread to run threaded_clientV2 because it makes use of infinite loop to
     Keep trace of client and it's request and will block the program if run on main thread
     """
+    connections.append(conn)
     start_new_thread(threaded_clientV2, (conn, uid))

@@ -1,6 +1,6 @@
+import random
 import time
 import uuid
-import random
 from _thread import *
 
 
@@ -67,7 +67,8 @@ class EnemyHandler:
                     self.enemies[k] = {
                         'x': newX,
                         'y': newY,
-                        'move': v['move']
+                        'move': v['move'],
+                        'etype': v['etype']
                     }
 
                 if move == 'RIGHT' or move == 'LEFT':
@@ -92,7 +93,8 @@ class EnemyHandler:
                 self.enemies[k] = {
                     'x': newX,
                     'y': newY,
-                    'move': v['move']
+                    'move': v['move'],
+                    'etype': v['etype']
                 }
         except:
             pass
@@ -104,26 +106,30 @@ class EnemyHandler:
                     # Enemy will spawn on random X and Top Y and will move down gradually
                     'x': random.randint(0, self.width - 50),
                     'y': 0,
-                    'move': 'DOWN'
+                    'move': 'DOWN',
+                    'etype': random.choice(self.enemyType),
                 },
                 {
                     # Enemy will spawn on random X and Bottom Y and will move up gradually
                     'x': random.randint(0, self.width - 50),
                     'y': self.height - 50,
-                    'move': 'UP'
+                    'move': 'UP',
+                    'etype': random.choice(self.enemyType),
 
                 },
                 {
                     # Enemy will spawn on random Y and Left X and will move Right gradually
                     'x': 0,
                     'y': random.randint(0, self.height - 50),
-                    'move': 'RIGHT'
+                    'move': 'RIGHT',
+                    'etype': random.choice(self.enemyType),
                 },
                 {
                     # Enemy will spawn on random Y and Right X and will move Left gradually
                     'x': self.width - 50,
                     'y': random.randint(0, self.height - 50),
-                    'move': 'LEFT'
+                    'move': 'LEFT',
+                    'etype': random.choice(self.enemyType),
                 }
             ]
             randEnemyData = random.choice(EnemySpawnData)
@@ -134,7 +140,7 @@ class EnemyHandler:
             self.enemies[uid] = {
                 'x': randEnemyData['x'],
                 'y': randEnemyData['y'],
-                'type': random.choice(self.enemyType),
+                'etype': randEnemyData['etype'],
                 'move': randEnemyData['move']
             }
             print(
@@ -185,3 +191,22 @@ class EnemyHandler:
             start_new_thread(self.startMoveTimer, ())
 
         return self.enemies
+
+    def enemyHit(self, x, y, acceptedRange):
+        kills = []
+        try:
+            hitLocSum = abs(x + y)
+            for k, v in self.enemies.items():
+                print(self.enemies[k])
+                enemyLocSum = abs(v['x'] + v['y'])
+                dif = abs(enemyLocSum - hitLocSum)
+                if dif < acceptedRange:
+                    # Delete the enemy
+                    hitX = v['x']
+                    hitY = v['y']
+                    etype = v['etype']
+                    kills.append({'x': hitX, 'y': hitY, 'type': etype})
+                    self.enemies.pop(k)
+            return kills
+        except:
+            return kills

@@ -2,22 +2,27 @@ import pygame as pg
 
 from frontend.models.characters.CharBase import CharacterBase
 from frontend.models.worlds.WldBase import WorldBase
-from _thread import *
 
 screenSize = (800, 600)  # Set width and height
 pg.init()  # initialize pygame
 win = pg.display.set_mode(screenSize)  # Setup Screen
-icon = pg.image.load("./assets/aquaman1-1.png.png")  # Load Icon
-pg.display.set_icon(icon)
+# icon = pg.image.load("./assets/aquaman1-1.png.png")  # Load Icon
+# pg.display.set_icon(icon)
 
 # Setup Server handler (Sends request to server as well as processes responses fro the server)
 from frontend.service.GuestService import GuestService
 
 guestService = GuestService(pg, win)  # Handles interacting with other players
+
+from frontend.service.EffectService import EffectService
+
+effectService = EffectService(pg, win)  # Handles drawing effects like explosion
+
 from frontend.service.ServerHandler import ServerHandler
 
 serverHandler = ServerHandler(
-    guestService=guestService)  # Creates object, connects to internet and starts listening to server for processing
+    guestService=guestService,
+    effectService=effectService)  # Creates object, connects to internet and starts listening to server for processing
 # We pass guestService because it needs to interact with it
 
 world = WorldBase(frameArray=[
@@ -31,15 +36,19 @@ world = WorldBase(frameArray=[
 ], frameChangeSpeed=30, piegae=pg, window=win)
 
 # Creating The MAIN PLAYER --------------------------------
-idle = pg.image.load("./assets/aquaman1-1.png.png")  # Initialize the frames for the player
+idle = pg.image.load("./assets/char/p/p_f.png")  # Initialize the frames for the player
+bwd = pg.image.load("./assets/char/p/p_b.png")  # Initialize the frames for the player
+lft = pg.image.load("./assets/char/p/p_l.png")  # Initialize the frames for the player
+rt = pg.image.load("./assets/char/p/p_r.png")  # Initialize the frames for the player
+
 # Creating the player Object
 player = CharacterBase(
     frameDict={
         "idle": idle,
         'top': idle,
-        'down': idle,
-        'left': idle,
-        'right': idle
+        'down': bwd,
+        'left': lft,
+        'right': rt
     },
     speed=1, window=win, piegae=pg)
 
@@ -48,12 +57,14 @@ def draws():
     world.drawWorld()
     guestService.drawOtherPlayers()
     guestService.drawEnemies()
+    guestService.drawShoot()
     player.draw()
+    effectService.draw()
     pg.display.update()
 
 
 def perFrameTask():
-    player.move()  # Listen to player input and allows the player to move
+    player.listenInput()  # Listen to player input and allows the player to move
     serverHandler.sendEssentialData((player.posX, player.posY))
     draws()  # Draws
 
@@ -66,6 +77,10 @@ def gameLoop():
             if e.type == pg.QUIT:
                 running = False
                 pg.quit()
+            if e.type == pg.MOUSEBUTTONDOWN:
+                pos = pg.mouse.get_pos()
+                serverHandler.sendShoot(pos[0], pos[1])
+
         perFrameTask()
 
 

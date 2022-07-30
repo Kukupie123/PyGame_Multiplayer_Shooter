@@ -10,12 +10,13 @@ log = logging.getLogger("Client Network")
 
 # noinspection PyMethodMayBeStatic
 class ServerHandler:
-    def __init__(self, guestService):
+    def __init__(self, guestService, effectService):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = "192.168.29.95"
         self.port = 5555
         self.addr = (self.server, self.port)
         self.guestService = guestService
+        self.effectService = effectService
         self.connect()  # Once we successfully connect we are going to continuously listen.
 
     def connect(self):
@@ -51,6 +52,16 @@ class ServerHandler:
                     self.guestService.updateEnemyPOSServer(
                         respParsed['data']
                     )
+
+                elif respParsed['action'] == 'shoot':  # Server notified of a shot
+                    self.guestService.updateShoot(idd=respParsed['data']['id'], x=respParsed['data']['x'],
+                                                  y=respParsed['data']['y'])
+                elif respParsed['action'] == 'kill':  # A kill has been triggered
+                    print("ENEMY DEAD!")
+                    killsRAW = respParsed['data'].decode()  # List of dict
+                    kills = json.loads(killsRAW)
+                    for k in kills:
+                        self.effectService.addBoom(0, 0, k['type'])
         except:
             pass
 
@@ -69,7 +80,6 @@ class ServerHandler:
 
     def sendEssentialData(self, playerXYTuple):
         try:
-            print(f"{playerXYTuple[0]} {playerXYTuple[1]}")
             playerPOS = {"action": "update_pos", "data": {"x": playerXYTuple[0], "y": playerXYTuple[1]}}
             reqEnemyData = {"action": "get_enemy_data"}
             reqPlayerPOSData = {"action": "get_player_pos"}
@@ -78,3 +88,10 @@ class ServerHandler:
             self.client.send(reqStr.encode())
         except Exception as e:
             print(f"Exception at sendEssentialData : {e}")
+
+    def sendShoot(self, x, y):
+        try:
+            request2send = [{"action": "shoot", "data": {"x": x, "y": y}}]
+            self.client.send(json.dumps(request2send).encode())
+        except:
+            pass

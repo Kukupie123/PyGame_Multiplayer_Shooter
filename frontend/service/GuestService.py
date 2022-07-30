@@ -2,6 +2,7 @@ from frontend.models.characters.CharBase import CharacterBase
 from frontend.models.characters.Enemy import Enemy
 
 
+# noinspection PyMethodMayBeStatic
 class GuestService:
     def __init__(self, pg, win):
         self.UID = "NULL"
@@ -15,8 +16,40 @@ class GuestService:
         self.pg = pg
         self.win = win
 
+        # Bullets
+        self.shootMaxDuration = 100
+        self.shootingPlayer = {}  # {uid : {canShoot:false/true, x:13,y:234, currentDuration : 0}}
+
     def updatePlayerPOSSERVER(self, pos_dic):  # {uid : (x,y)}
         self.pos_dic = pos_dic
+
+    def updateShoot(self, idd, x, y):
+        tempDic = {
+            "canShoot": True,
+            "x": x,
+            "y": y,
+            "duration": 0
+        }
+        self.shootingPlayer[idd] = tempDic
+
+    def drawShoot(self):
+        for k, v in self.shootingPlayer.items():
+            duration = v['duration']
+            canShoot = v['canShoot']
+            if canShoot:
+                if duration < self.shootMaxDuration:
+                    self.pg.draw.line(self.win, (0, 0, 0), (self.players[k].posX, self.players[k].posY),
+                                      (v['x'], v['y']))
+                    duration += 1
+                else:
+                    duration = 0
+                    canShoot = False
+            self.shootingPlayer[k] = {
+                "canShoot": canShoot,
+                "duration": duration,
+                "x": v['x'],
+                "y": v['y']
+            }
 
     def updateEnemyPOSServer(self, enemy_data):
         """
@@ -68,34 +101,43 @@ class GuestService:
             pass
 
     def drawOtherPlayers(self):
-        for k, v in self.pos_dic.items():
-            if k == self.UID:  # If its the same player as this client we do not draw as it is the player
-                continue
-            if k not in self.players:  # if main player is not in list we create new player with the id
-                idle = self.pg.image.load(
-                    "../frontend/assets/aquaman1-1.png.png")  # Initialize the frames for the player
-                print(f"Adding {k} to the guestList with position {v}")
-                # Creating The MAIN PLAYER --------------------------------
-                # Creating the player Object
-                player = CharacterBase(
-                    frameDict={
-                        "idle": idle,
-                        'top': idle,
-                        'down': idle,
-                        'left': idle,
-                        'right': idle
-                    },
-                    speed=1, window=self.win, piegae=self.pg)
-                self.players[k] = player
+        try:
+            for k, v in self.pos_dic.items():
+                if k == self.UID:  # If its the same player as this client we do not draw as it is the player
+                    continue
+                if k not in self.players:  # if main player is not in list we create new player with the id
+                    idle = self.pg.image.load(
+                        "../frontend/assets/char/g/g_f.png")  # Initialize the frames for the player
+                    bw = self.pg.image.load(
+                        "../frontend/assets/char/g/g_b.png")
+                    l = self.pg.image.load(
+                        "../frontend/assets/char/g/g_l.png")
+                    r = self.pg.image.load(
+                        "../frontend/assets/char/g/g_r.png")
+                    print(f"Adding {k} to the guestList with position {v}")
+                    # Creating The MAIN PLAYER --------------------------------
+                    # Creating the player Object
+                    player = CharacterBase(
+                        frameDict={
+                            "idle": idle,
+                            'top': idle,
+                            'down': bw,
+                            'left': l,
+                            'right': r
+                        },
+                        speed=1, window=self.win, piegae=self.pg)
+                    self.players[k] = player
 
-            self.players[k].updatePos(v[0], v[
-                1])  # This should never fail as we are creating player for this ID in the if block above when its empty
+                self.players[k].updatePos(v[0], v[
+                    1])  # This should never fail as we are creating player for this ID in the if block above when its empty
 
-        # Get rid of disconnected players, i.e players who are not in the parameter supplied which has all the current active player sent from the server
-        for k in self.players:
-            if k not in self.pos_dic:
-                self.players.pop(k)
+            # Get rid of disconnected players, i.e players who are not in the parameter supplied which has all the current active player sent from the server
+            for k in self.players:
+                if k not in self.pos_dic:
+                    self.players.pop(k)
 
-        # Draw each players now
-        for k in self.players:
-            self.players[k].draw()
+            # Draw each players now
+            for k in self.players:
+                self.players[k].draw()
+        except:
+            pass
