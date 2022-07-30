@@ -45,8 +45,35 @@ WITH FLOWCHART<br>
 4. Enemy Spawn system and move system
    <br>
    The flow of this system is fairly long so.....
-5.
+
+   <br>
+   In sendEssentialData we request EnemyPOS. Server listens this and calls enemyHandler.getEnemies and returns it back to the client
+
+
+
 
 <br>
 
 6. 2 Types of animation we have and how they work
+7. Enemy Shoot System, kill system and explosion system
+   1. In main loop listen for mouse event
+   2. call serverHandler.sendShoot(xy) mouse pos
+      1. sendShoot : informs the server about this event
+      2. Server listens and starts a broadcast in a new thread, it does this because it needs to loop through every
+         single player and notify them that a client has shot but if we run it in the current thread the whole program
+         will be frozen until the loop is over and that iis not intended so we start a new thread for broadcasting it
+         1. BroadCast:
+         2. loops through each connected client and sends then the data
+         3. calls enemyHandler.checkHit(xy)
+            1. checkHit:
+            2. Loops through all enemy and checks if they are close to hit position
+            3. if they are we store them in a temporary list and remove them from the class's enemy list
+            4. we then return this
+         4. BroadCast:
+         5. Checks if we killed any enemy (i.e checks if list is empty or not)
+         6. if the shot killed an enemy we are going to broadcast this info as well in a new thread
+   3. Client :
+   4. client listens that a player has shot and calls guestService.updateShoot
+   5. update shoot will then add a new shoot record that needs to be drawn in the main loop
+   6. client listens that an enemy has been killed and calls effect.updateBoom
+   7. we add a boom record and the draw function will take care of animating the boom in the given XY coordinate
