@@ -25,3 +25,28 @@ Features
 4. Shoot the enemies with mouse click
 5. Fully network replicated and functioning multiplayer
 6. Animating sprites for NPCs and Background
+
+<br>
+
+**topics to talk about in presentation are :**
+
+**General Flow of the program (Both Client and server)**
+<br>Talk about how server stores clients and multithread dedicated while loop for each client when talking about server
+WITH FLOWCHART<br>
+
+**The way the payload that is sent between client and server is structured**
+<br>SHOW IMAGE and Example <br>
+
+1. Multi threading in our program
+2. Character movement system and (Start from mainloop->draw, then mainLoop->listenInput(), then serverHandler->
+   sendEssentialData()->sendPlayersPOS->ServerUpdatingPlayerPOS list)
+3. How characters are synced across different clients(sendEssentialData->server listen-> send back players list->client
+   sending this to guestService.updatePlayerPOS->mainLoop.guestService.draw().
+4. Enemy Spawn system and move system
+   <br>
+   The flow of this system is fairly long so.....
+5.
+
+<br>
+
+6. 2 Types of animation we have and how they work

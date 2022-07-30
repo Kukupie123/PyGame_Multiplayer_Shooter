@@ -81,9 +81,10 @@ class ServerHandler:
 
     def sendEssentialData(self, playerXYTuple):
         try:
-            playerPOS = {"action": "update_pos", "data": {"x": playerXYTuple[0], "y": playerXYTuple[1]}}
-            reqEnemyData = {"action": "get_enemy_data"}
-            reqPlayerPOSData = {"action": "get_player_pos"}
+            playerPOS = {"action": "update_pos", "data": {"x": playerXYTuple[0], "y": playerXYTuple[
+                1]}}  # Inform Server to update player's position
+            reqEnemyData = {"action": "get_enemy_data"}  # Get the enemy data {xy,type}
+            reqPlayerPOSData = {"action": "get_player_pos"}  # Get Connected players position
             reqs = [playerPOS, reqEnemyData, reqPlayerPOSData]
             reqStr = json.dumps(reqs)
             self.client.send(reqStr.encode())
