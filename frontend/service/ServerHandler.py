@@ -57,13 +57,13 @@ class ServerHandler:
                     self.guestService.updateShoot(idd=respParsed['data']['id'], x=respParsed['data']['x'],
                                                   y=respParsed['data']['y'])
                 elif respParsed['action'] == 'kill':  # A kill has been triggered
-                    print("ENEMY DEAD!")
-                    killsRAW = respParsed['data'].decode()  # List of dict
-                    kills = json.loads(killsRAW)
+
+                    kills = respParsed['data']  # List of dict
+                    print(f"ENEMY DEAD! {kills}")
                     for k in kills:
-                        self.effectService.addBoom(0, 0, k['type'])
-        except:
-            pass
+                        self.effectService.addBoom(k['x'], k['y'], k['type'])
+        except Exception as e:
+            print(e)
 
     def multi_listen(self):
         """

@@ -104,7 +104,6 @@ def threaded_clientV2(conn, uid):
                                        y)  # Update the dictionary key's value with the new XY value, This is why we needed UID for each client. To distinguish between them
 
                 elif action == 'shoot':  # action, data : {x,y}
-                    print("SHOTTTTTTTTTTTTTTTTTTT")
                     """
                     Send a broadcast to all client
                     action : shoot
