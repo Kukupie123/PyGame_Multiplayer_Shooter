@@ -56,12 +56,12 @@ def draws():
     """
     Draws several entities on the screen when called
     """
-    world.drawWorld()
-    guestService.drawOtherPlayers()
-    guestService.drawEnemies()
-    guestService.drawShoot()
-    player.draw()
-    effectService.draw()
+    world.drawWorld()  # level
+    guestService.drawOtherPlayers()  # other players
+    guestService.drawEnemies()  # Enemies draw
+    guestService.drawShoot()  # shooting
+    player.draw()  # Player
+    effectService.draw()  # Explosions effect
     pg.display.update()
 
 

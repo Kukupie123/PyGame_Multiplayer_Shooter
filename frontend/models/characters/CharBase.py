@@ -89,19 +89,6 @@ class CharacterBase:
         :param y: the y value
         """
 
-        xAxis = 0
-        yAxis = 0
-        if not (self.posX == x and self.posY == y):
-            if x > 0:
-                xAxis = 1
-            else:
-                x = -1
-
-            if y > 0:
-                yAxis = 1
-            else:
-                yAxis = -1
-
         self.posX = x
         self.posY = y
 
@@ -120,6 +107,7 @@ class CharacterBase:
             x = 1
         else:
             x = 0
+
         if keys[self.pg.K_UP]:
             y = -1
         elif keys[self.pg.K_DOWN]:
@@ -127,26 +115,21 @@ class CharacterBase:
         else:
             y = 0
 
-        # Update last pos
-        self.lastX = self.posX
-        self.lastY = self.posY
-
         # Add the XY Values
-        self.posX += x * self.speed
+        self.posX += x * self.speed  # current player's X + x
         self.posY += y * self.speed
 
         self.posY = self.__clamp(minAllowed=0, maxAllowed=self.window.get_size()[1] - 50, value=self.posY)
         self.posX = self.__clamp(minAllowed=0, maxAllowed=self.window.get_size()[0] - 50, value=self.posX)
 
         # Update the Frame based on XY values
-
         # No Left/Right Movement
         if x == 0:
             if y == 0:
                 self.currentFrame = self.frame['idle']
-            elif y < 0:
+            elif y < 0:  # 1
                 self.currentFrame = self.frame['top']
-            elif y > 0:
+            elif y > 0:  # -1
                 pass
                 self.currentFrame = self.frame['down']
         # Right Movement
