@@ -25,13 +25,33 @@ serverHandler = ServerHandler(
 # Creating LEVEL ----------------------------------------
 
 world = WorldBase(frameArray=[
-    pg.image.load("./assets/World/1/1_(1).png"),
-    pg.image.load("./assets/World/1/1_(2).png"),
-    pg.image.load("./assets/World/1/1_(3).png"),
-    pg.image.load("./assets/World/1/1_(4).png"),
-    pg.image.load("./assets/World/1/1_(5).png"),
-    pg.image.load("./assets/World/1/1_(6).png"),
-    pg.image.load("./assets/World/1/1_(7).png")
+    pg.image.load("./assets/World/Layer 1_sprite_01.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_02.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_03.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_04.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_05.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_06.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_07.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_08.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_09.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_10.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_11.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_12.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_13.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_14.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_15.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_16.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_17.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_18.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_19.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_20.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_21.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_22.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_23.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_24.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_25.png"),
+    pg.image.load("./assets/World/Layer 1_sprite_26.png"),
+
 ], frameChangeSpeed=30, piegae=pg, window=win)
 
 # Creating The MAIN PLAYER --------------------------------
