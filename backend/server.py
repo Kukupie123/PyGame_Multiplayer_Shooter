@@ -227,11 +227,11 @@ def threaded_client(conn, uid):
 while True:
     # Continuously Look for Connection and accept a connection when we find one
     conn, addr = sk.accept()  # Combination of IP and Port is unique
-    uid = str(addr[0]) + str(addr[1])  # Create a UID for every client
-
+    uid = str(addr[0]) + str(addr[1])  # Create a UID for every client`
     """
     Start a new thread to run threaded_clientV2 because it makes use of infinite loop to
     Keep trace of client and it's request and will block the program if run on main thread
     """
-    connections.append(conn)
-    start_new_thread(threaded_clientV2, (conn, uid))
+    connections.append(conn)  # Add the client to a list to keep track of connected users
+    start_new_thread(threaded_clientV2,
+                     (conn, uid))  # Start listening to the client in a new thread until they disconnect

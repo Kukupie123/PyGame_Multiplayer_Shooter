@@ -159,7 +159,7 @@ class EnemyHandler:
         while True:
             if len(self.enemies) < 10:
                 self.__createEnemy()
-            time.sleep(15)
+            time.sleep(5)
 
     def startMoveTimer(self):
         """

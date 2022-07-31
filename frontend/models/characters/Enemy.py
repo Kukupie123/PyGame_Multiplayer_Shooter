@@ -1,5 +1,4 @@
 from frontend.models.characters.CharBase import CharacterBase
-import random
 
 
 class Enemy(CharacterBase):

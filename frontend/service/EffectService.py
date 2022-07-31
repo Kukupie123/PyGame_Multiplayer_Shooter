@@ -58,7 +58,6 @@ class EffectService:
 
     def draw(self):
         width = self.win.get_size()[0]
-        height = self.win.get_size()[1]
         self.win.blit(self.scoreText, (width / 2, 20))
 
         for boom in self.booms:
