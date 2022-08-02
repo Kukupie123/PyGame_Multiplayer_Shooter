@@ -49,12 +49,13 @@ def broadcaster(action, data):
     respStr = json.dumps(resp).encode()
     for conn in connections:
         try:
-            conn.sendall(respStr)
+            conn.sendall(respStr)  # Notify every client about the broadcast
         except:
             pass
 
-    kills = enemyHandler.enemyHit(data['x'], data['y'], 50)  # [x,y,type]
-    if len(kills) > 0:
+    kills = enemyHandler.enemyHit(data['x'], data['y'],
+                                  50)  # Check if the shot hit any enemy and return a list of enemies that shot & Delete the enemy
+    if len(kills) > 0:  # If the shot hit someone broadcast this to all clients in new thread
         start_new_thread(broadcaster, ("kill", kills))
 
 

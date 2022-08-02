@@ -18,9 +18,7 @@ class WorldBase:
         self.win.blit(img, (0, 0))  # Draw it on the screen
         self.CurrentGameFrame += 1  # Increment Current Game Frame by 1
 
-        if self.CurrentGameFrame >= self.frameChangeSpeed:
+        if self.CurrentGameFrame >= self.frameChangeSpeed:  # If currentGameFrame exceeds frameChangeSpeed
             self.CurrentGameFrame = 0  # Reset the currentFrame Count
             # Set current Image to 0 if we are at the end of frames else we use the next image in the frame
-            # print(self.CurrentFrameIndex)
             self.CurrentFrameIndex = self.CurrentFrameIndex + 1 if (self.CurrentFrameIndex < len(self.frame) - 1) else 0
-            # print("Changing World Frame")

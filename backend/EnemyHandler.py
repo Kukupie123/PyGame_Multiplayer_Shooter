@@ -38,14 +38,14 @@ class EnemyHandler:
         """
         try:  # Since we are multi threading the elements may be deleted mid iteration
             speed = 1
-            for k, v in self.enemies.items():
-                addX = 0
-                addY = 0
-                move = v['move']
+            for k, v in self.enemies.items():  # Iterate through the enemies
+                addX = 0  # The X value to add to the enemy's position
+                addY = 0  # The Y value to add to the enemy's position
+                move = v['move']  # Value which is going to determine which direction to move to
 
-                # For Up Down
+                # For Up Down movement
                 if move == 'DOWN' or 'UP':
-                    # X first
+                    # X will be randomly assigned to -1 0r 1
                     if random.randint(-50, 50) % 2 == 0:
                         if random.randint(-50, 50) % 2 == 0:
                             addX = speed
@@ -153,8 +153,7 @@ class EnemyHandler:
         """
         Needs to run in a multi thread env.
         Adds enemy to enemies list after certain interval of time
-        Timer resets when an enemy is removed from the enemies list.
-        Enemies are removed from list when it goes out of bound or is killed by client
+        Enemies are removed from list when it goes out of bound or is shot by client
         """
         while True:
             if len(self.enemies) < 10:
@@ -182,13 +181,12 @@ class EnemyHandler:
         if not self.enemies:
             self.__createEnemy()  # Created first enemy
 
-        # Start timers if not started
-        if not self.spawnTimerActive:
+        if not self.spawnTimerActive:  # Check if spawnTimer has starter.
             self.spawnTimerActive = True
-            start_new_thread(self.startSpawnTimer, ())
-        if not self.moveTimerActive:
+            start_new_thread(self.startSpawnTimer, ())  # Start Spawn timer in a new thread
+        if not self.moveTimerActive:  # Check if moveTimer has started
             self.moveTimerActive = True
-            start_new_thread(self.startMoveTimer, ())
+            start_new_thread(self.startMoveTimer, ())  # Start MoveTimer
 
         return self.enemies
 
